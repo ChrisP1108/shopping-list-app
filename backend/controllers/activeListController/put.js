@@ -1,4 +1,5 @@
 const asyncHandler = require('express-async-handler');
+const ShoppingList = require('../../models/shoppingList');
 
 // Update Active Shopping List By ID
 
