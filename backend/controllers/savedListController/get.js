@@ -1,9 +1,15 @@
-function getSavedLists (req, res) {
-    return res.status(200).json({ msg: 'Get Saved Shopping Lists'})
-}
+const asyncHandler = require('express-async-handler');
 
-function getSavedList (req, res) {
-    return res.status(200).json({ msg: `Get Saved Shopping List ${req.params.id}`})
-}
+// Get All Saved Shopping Lists
+
+const getSavedLists = asyncHandler(async (req, res) => {
+    res.status(200).json({ msg: 'Get Saved Shopping Lists'})
+});
+
+// Get Saved Shopping List By ID
+
+const getSavedList = asyncHandler(async (req, res) => {
+    res.status(200).json({ msg: `Get Saved Shopping List ${req.params.id}`})
+});
 
 module.exports = { getSavedLists, getSavedList }
