@@ -1,20 +1,22 @@
 const mongoose = require('mongoose');
 
+const itemSchema = mongoose.Schema({
+    name: {
+        type: String,
+        required: [true]
+    },
+    quantity: {
+        type: Number,
+        required: [true]
+    }
+})
+
 const shoppingListSchema = mongoose.Schema({
     name: {
         type: String,
         required: [true, 'A Shopping List Name Must Be Provided']
     },
-    items: [{
-        name: {
-            type: String,
-            required: [false]
-        },
-        quantity: {
-            type: Number,
-            required: [false]
-        }
-    }]
+    items: [itemSchema]
 }, {
     timestamps: true
 });
