@@ -8,11 +8,16 @@ const postActiveList = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('A Shopping List Name Must Be Provided')
     }
-    const shoppingList = await ShoppingList.create({
+    const shoppingList = await ShoppingList.find();
+    if(shoppingList.length) {
+        res.status(400);
+        throw new Error('An Active Shopping List Already Exists')
+    }
+    const shoppingListCreate = await ShoppingList.create({
         name: req.body.name,
         items: req.body.items
     })
-    res.status(200).json(shoppingList)
+    res.status(200).json(shoppingListCreate)
 });
 
 // Add Active Shopping List Item

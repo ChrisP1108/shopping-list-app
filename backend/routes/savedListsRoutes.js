@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-const { getSavedLists, getSavedList, getSavedListItems, getSavedListItem } = require('../controllers/savedListController/get');
-const { postSavedList, postSavedListItem } = require('../controllers/savedListController/post');
-const { putSavedList, putSavedListItem } = require('../controllers/savedListController/put');
-const { deleteSavedList, deleteSavedListItems, deleteSavedListItem } = require('../controllers/savedListController/delete');
+const { getSavedLists, getSavedList, getSavedListItems, getSavedListItem } = require('../controllers/savedListsController/get');
+const { postSavedList, postSavedListItem } = require('../controllers/savedListsController/post');
+const { putSavedList, putSavedListItem } = require('../controllers/savedListsController/put');
+const { deleteSavedList, deleteSavedListItems, deleteSavedListItem } = require('../controllers/savedListsController/delete');
 
 router.get('/', getSavedLists);
 
