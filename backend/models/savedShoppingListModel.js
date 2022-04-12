@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const savedShoppingListSchema = mongoose.Schema({
+    user: {
+        type: String,
+        required: [true, 'A User ID Must Be Provided']
+    },
     name: {
         type: String,
         required: [true, 'A Shopping List Name Must Be Provided'],

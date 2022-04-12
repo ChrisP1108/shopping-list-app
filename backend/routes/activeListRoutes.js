@@ -6,26 +6,28 @@ const { postActiveList, postActiveListItem } = require('../controllers/activeLis
 const { putActiveList, putActiveListItem } = require('../controllers/activeListController/put');
 const { deleteActiveList, deleteActiveListItems, deleteActiveListItem } = require('../controllers/activeListController/delete');
 
-router.get('/', getActiveLists);
+const { protect } = require('../middleware/authMiddleware');
 
-router.get('/:id', getActiveList);
+router.get('/', protect, getActiveLists);
 
-router.get('/:id/items', getActiveListItems);
+router.get('/:id', protect, getActiveList);
 
-router.get('/:id/items/:id', getActiveListItem);
+router.get('/:id/items', protect, getActiveListItems);
 
-router.post('/', postActiveList);
+router.get('/:id/items/:id', protect, getActiveListItem);
 
-router.post('/:id', postActiveListItem);
+router.post('/', protect, postActiveList);
 
-router.put('/:id', putActiveList);
+router.post('/:id', protect, postActiveListItem);
 
-router.put('/:id/items/:id', putActiveListItem);
+router.put('/:id', protect, putActiveList);
 
-router.delete('/:id', deleteActiveList);
+router.put('/:id/items/:id', protect, putActiveListItem);
 
-router.delete('/:id/items', deleteActiveListItems);
+router.delete('/:id', protect, deleteActiveList);
 
-router.delete('/:id/items/:id', deleteActiveListItem);
+router.delete('/:id/items', protect, deleteActiveListItems);
+
+router.delete('/:id/items/:id', protect, deleteActiveListItem);
 
 module.exports = router;

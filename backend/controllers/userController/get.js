@@ -1,7 +1,7 @@
 const asyncHandler = require('express-async-handler');
-const Root = require('../../models/savedShoppingList');
+const Root = require('../../models/savedShoppingListModel');
 
-// Get User Information
+// Get User Data
 
 const getUser = asyncHandler(async (req, res) => {
     const { username, password } = req.body;
@@ -15,13 +15,11 @@ const getUser = asyncHandler(async (req, res) => {
         throw new Error('A Password Must Be Provided')
     }
     const userLogin = await Root.find({
-        user: {
-            username: username,
-            password: password
-        }
+        username: username,
+        password: password
     });
-    
-    if(!userLogin.length) {
+
+    if(!userLogin) {
         res.status(400);
         throw new Error('User Not Found')
     }

@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const ShoppingList = require('../../models/savedShoppingList');
+const ShoppingList = require('../../models/savedShoppingListModel');
 
 // Add Saved Shopping List
 
@@ -15,6 +15,7 @@ const postSavedList = asyncHandler(async (req, res) => {
         throw new Error('A Shopping List With The Same Name Already Exists')
     }
     const shoppingListCreate = await ShoppingList.create({
+        user: req.user._id.toString(),
         name: name,
         items: items
     })
@@ -26,12 +27,15 @@ const postSavedList = asyncHandler(async (req, res) => {
 const postSavedListItem = asyncHandler(async (req, res) => {
     const { name, quantity } = req.body
     
-    const shoppingList = await ShoppingList.findById(req.params.id);
-    if(!shoppingList) {
+    const shoppingList = await ShoppingList.find({ 
+        _id: req.params.id,
+        user: req.user._id
+    });
+    if (!shoppingList) {
         res.status(400);
         throw new Error('Shopping List Not Found')
     }
-    if(shoppingList.items.some(item => item.name === name)) {
+    if (shoppingList.items.some(item => item.name === name)) {
         res.status(400);
         throw new Error('A Shopping List Item With The Same Name Already Exists')
     }

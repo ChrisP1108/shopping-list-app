@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const ShoppingList = require('../../models/activeShoppingList');
+const ShoppingList = require('../../models/activeShoppingListModel');
 
 // Add Active Shopping List
 
@@ -15,6 +15,7 @@ const postActiveList = asyncHandler(async (req, res) => {
         throw new Error('An Active Shopping List Already Exists')
     }
     const shoppingListCreate = await ShoppingList.create({
+        user: req.user._id.toString(),
         name: name,
         items: items
     })
@@ -25,7 +26,10 @@ const postActiveList = asyncHandler(async (req, res) => {
 
 const postActiveListItem = asyncHandler(async (req, res) => {
     const { name, quantity } = req.body
-    const shoppingList = await ShoppingList.findById(req.params.id);
+    const shoppingList = await ShoppingList.find({ 
+        _id: req.params.id,
+        user: req.user._id
+    });
     
     if(!shoppingList) {
         res.status(400);

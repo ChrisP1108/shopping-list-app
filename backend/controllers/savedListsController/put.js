@@ -1,11 +1,14 @@
 const asyncHandler = require('express-async-handler');
-const ShoppingList = require('../../models/savedShoppingList');
+const ShoppingList = require('../../models/savedShoppingListModel');
 
 // Update Saved Shopping List By ID
 
 const putSavedList = asyncHandler(async (req, res) => {
     const { name } = req.body;
-    const shoppingList = await ShoppingList.findById(req.params.id);
+    const shoppingList = await ShoppingList.find({ 
+        _id: req.params.id,
+        user: req.user._id
+    });
     
     if (!shoppingList) {
         res.status(400);
@@ -32,7 +35,10 @@ const putSavedListItem = asyncHandler(async (req, res) => {
     
     let shoppingListId = req._parsedUrl.pathname.slice(1);
     shoppingListId = shoppingListId.slice(0, shoppingListId.indexOf('/'));
-    const shoppingList = await ShoppingList.findById(shoppingListId);
+    const shoppingList = await ShoppingList.find({ 
+        _id: shoppingListId,
+        user: req.user._id
+    });
 
     if (!shoppingList) {
         res.status(400);

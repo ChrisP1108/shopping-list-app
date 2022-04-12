@@ -1,10 +1,13 @@
 const asyncHandler = require('express-async-handler');
-const ShoppingList = require('../../models/savedShoppingList');
+const ShoppingList = require('../../models/savedShoppingListModel');
 
 // Delete Saved Shopping List Or Item By ID
 
 const deleteSavedList = asyncHandler(async (req, res) => {
-    const shoppingList = await ShoppingList.findById(req.params.id);
+    const shoppingList = await ShoppingList.find({ 
+        _id: req.params.id,
+        user: req.user._id
+    });
     if(!shoppingList) {
         res.status(400);
         throw new Error('Shopping List Not Found')
@@ -16,7 +19,10 @@ const deleteSavedList = asyncHandler(async (req, res) => {
 // Delete Saved Shopping List Items
 
 const deleteSavedListItems = asyncHandler(async (req, res) => {
-    const shoppingList = await ShoppingList.findById(req.params.id);
+    const shoppingList = await ShoppingList.find({ 
+        _id: req.params.id,
+        user: req.user._id
+    });
 
     if (!shoppingList) {
         res.status(400);
@@ -33,7 +39,10 @@ const deleteSavedListItems = asyncHandler(async (req, res) => {
 const deleteSavedListItem = asyncHandler(async (req, res) => {
     let shoppingListId = req._parsedUrl.pathname.slice(1);
     shoppingListId = shoppingListId.slice(0, shoppingListId.indexOf('/'));
-    const shoppingList = await ShoppingList.findById(shoppingListId);
+    const shoppingList = await ShoppingList.find({ 
+        _id: shoppingListId,
+        user: req.user._id
+    });
 
     if (!shoppingList) {
         res.status(400);

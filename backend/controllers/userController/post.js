@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const asyncHandler = require('express-async-handler');
-const User = require('../../models/user');
+const User = require('../../models/userModel');
 
 // Register New User
 
@@ -30,7 +30,7 @@ const postUserRegister = asyncHandler(async (req, res) => {
     const userExists = await User.findOne({username})
     if (userExists) {
         res.status(400);
-        throw new Error('A User With The Same Username Already Exists')
+        throw new Error('A User With The Same Username Already Exists.  Please Register A Different Username')
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -44,7 +44,8 @@ const postUserRegister = asyncHandler(async (req, res) => {
     if (userCreate) {
         res.status(201).json({
             _id: userCreate.id,
-            username: userCreate.user.username
+            username: userCreate.username,
+            token: generateToken(userCreate._id)
         });
     } else {
         res.status(400);
@@ -66,19 +67,31 @@ const postUserLogin = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('A Password Must Be Provided To Login')
     }
-    const userLogin = await User.find({
-        user: {
-            username: username,
-            password: password
-        }
-    });
+    const user = await User.findOne({ username });
 
-    if(!userLogin.length) {
+    if (!user) {
         res.status(400);
         throw new Error('User Not Found')
     }
-    res.status(200).json(userLogin);
+
+    if (!await bcrypt.compare(password, user.password)) {
+        res.status(400);
+        throw new Error('Invalid Password')
+    }
+    res.status(200).json({
+        _id: user.id,
+        username: user.username,
+        token: generateToken(user._id)
+    });
 });
+
+// Generate JWT
+
+const generateToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+        expiresIn: '30d'
+    })
+}
 
 module.exports = {
     postUserRegister,
