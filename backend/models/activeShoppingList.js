@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const shoppingListSchema = mongoose.Schema({
+const activeShoppingListSchema = mongoose.Schema({
     name: {
         type: String,
         required: [true, 'A Shopping List Name Must Be Provided'],
@@ -22,4 +22,4 @@ const shoppingListSchema = mongoose.Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model('ShoppingList', shoppingListSchema)
+module.exports = mongoose.model('ActiveShoppingList', activeShoppingListSchema)

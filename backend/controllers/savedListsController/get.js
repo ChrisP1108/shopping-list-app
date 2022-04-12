@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const ShoppingList = require('../../models/shoppingList');
+const ShoppingList = require('../../models/savedShoppingList');
 
 // Get All Saved Shopping Lists
 
@@ -44,7 +44,8 @@ const getSavedListItem = asyncHandler(async (req, res) => {
         throw new Error('Shopping List Not Found')
     }
 
-    const shoppingListItem = shoppingList.items.find(item => item._id.toString() === req.params.id);
+    const shoppingListItem = shoppingList.items.find(item => 
+        item._id.toString() === req.params.id);
 
     if (!shoppingListItem) {
         res.status(400);

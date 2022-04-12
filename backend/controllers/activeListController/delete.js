@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const ShoppingList = require('../../models/shoppingList');
+const ShoppingList = require('../../models/activeShoppingList');
 
 // Delete Active Shopping List Or Item By ID
 

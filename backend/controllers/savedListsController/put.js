@@ -1,21 +1,22 @@
 const asyncHandler = require('express-async-handler');
-const ShoppingList = require('../../models/shoppingList');
+const ShoppingList = require('../../models/savedShoppingList');
 
 // Update Saved Shopping List By ID
 
 const putSavedList = asyncHandler(async (req, res) => {
+    const { name } = req.body;
     const shoppingList = await ShoppingList.findById(req.params.id);
     
     if (!shoppingList) {
         res.status(400);
         throw new Error('Shopping List Not Found')
     }
-    if (!req.body.name) {
+    if (!name) {
         res.status(400);
         throw new Error('Shopping List Name Must Be Defined')
     }
     
-    shoppingList.name = req.body.name
+    shoppingList.name = name
 
     const updatedShoppingList = await ShoppingList
         .findByIdAndUpdate(req.params.id, shoppingList, {new: true});
@@ -27,6 +28,8 @@ const putSavedList = asyncHandler(async (req, res) => {
 // Update Saved Shopping List Item By ID
 
 const putSavedListItem = asyncHandler(async (req, res) => {
+    const { name, quantity } = req.body;
+    
     let shoppingListId = req._parsedUrl.pathname.slice(1);
     shoppingListId = shoppingListId.slice(0, shoppingListId.indexOf('/'));
     const shoppingList = await ShoppingList.findById(shoppingListId);
@@ -36,7 +39,7 @@ const putSavedListItem = asyncHandler(async (req, res) => {
         throw new Error('Shopping List Not Found')
     }
 
-    if(!req.body || !req.body.name || !req.body.quantity) {
+    if(!req.body || !name || !quantity) {
         res.status(400);
         throw new Error('Shopping List Item Must Have A Name And Quantity To Update')
     }
@@ -55,7 +58,7 @@ const putSavedListItem = asyncHandler(async (req, res) => {
         .findByIdAndUpdate(shoppingListId, shoppingList, {new: true});
 
     let updatedRes = await ShoppingList.findById(shoppingListId);
-    updatedRes = updatedRes.items.find(item => item.name === req.body.name);
+    updatedRes = updatedRes.items.find(item => item.name === name);
     res.status(200).json(updatedRes); 
 });
 
