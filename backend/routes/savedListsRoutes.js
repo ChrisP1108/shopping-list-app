@@ -6,26 +6,28 @@ const { postSavedList, postSavedListItem } = require('../controllers/savedListsC
 const { putSavedList, putSavedListItem } = require('../controllers/savedListsController/put');
 const { deleteSavedList, deleteSavedListItems, deleteSavedListItem } = require('../controllers/savedListsController/delete');
 
-router.get('/', getSavedLists);
+const { protect } = require('../middleware/authMiddleware');
 
-router.get('/:id', getSavedList);
+router.get('/', protect, getSavedLists);
 
-router.get('/:id/items', getSavedListItems);
+router.get('/:id', protect, getSavedList);
 
-router.get('/:id/items/:id', getSavedListItem);
+router.get('/:id/items', protect, getSavedListItems);
 
-router.post('/', postSavedList);
+router.get('/:id/items/:id', protect, getSavedListItem);
 
-router.post('/:id', postSavedListItem);
+router.post('/', protect, postSavedList);
 
-router.put('/:id', putSavedList);
+router.post('/:id', protect, postSavedListItem);
 
-router.put('/:id/items/:id', putSavedListItem);
+router.put('/:id', protect, putSavedList);
 
-router.delete('/:id', deleteSavedList);
+router.put('/:id/items/:id', protect, putSavedListItem);
 
-router.delete('/:id/items', deleteSavedListItems);
+router.delete('/:id', protect, deleteSavedList);
 
-router.delete('/:id/items/:id', deleteSavedListItem);
+router.delete('/:id/items', protect, deleteSavedListItems);
+
+router.delete('/:id/items/:id', protect, deleteSavedListItem);
 
 module.exports = router;

@@ -1,29 +1,26 @@
 const asyncHandler = require('express-async-handler');
-const Root = require('../../models/savedShoppingListModel');
+const User = require('../../models/userModel');
+const ActiveShoppingList = require('../../models/activeShoppingListModel');
+const SavedShoppingList = require('../../models/savedShoppingListModel');
 
 // Get User Data
 
 const getUser = asyncHandler(async (req, res) => {
-    const { username, password } = req.body;
+    const { username } = req.body;
     
-    if (!username) {
-        res.status(400);
-        throw new Error('A Username Must Be Provided')
-    }
-    if (!password) {
-        res.status(400);
-        throw new Error('A Password Must Be Provided')
-    }
-    const userLogin = await Root.find({
-        username: username,
-        password: password
-    });
-
+    const userLogin = await User.find({ username });
     if(!userLogin) {
         res.status(400);
         throw new Error('User Not Found')
     }
-    res.status(200).json(userLogin);
+
+    const activeList = await ActiveShoppingList.find({ user: req.user.id })
+    const savedList = await SavedShoppingList.find({ user: req.user.id })
+    res.status(200).json({ 
+        user: userLogin[0],
+        activeShoppingList: [...activeList ],
+        savedShoppingLists: [...savedList]
+    });
 });
 
 module.exports = { getUser }
