@@ -16,6 +16,10 @@ const postList = asyncHandler(async (req, res, ShoppingList, mulOk) => {
             throw new Error('Active Shopping List Can Have Only One List At A Time')
         }
     }
+    if (shoppingList.some(list => list.name === name)) {
+        res.status(400);
+        throw new Error('A Shopping List With The Same Name Already Exists')
+    }
     
     const shoppingListCreate = await ShoppingList.create({
         user: req.user.id,
