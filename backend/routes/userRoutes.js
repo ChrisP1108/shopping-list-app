@@ -4,10 +4,10 @@ const { postUserRegister, postUserLogin } = require('../controllers/userControll
 const { getUser } = require('../controllers/userController/get');
 const { protect } = require('../middleware/authMiddleware');
 
-router.post('/', postUserRegister);
+router.post('/register', postUserRegister);
 
 router.post('/login', postUserLogin)
 
-router.get('/user', protect, getUser)
+router.get('/:id', protect, getUser)
 
 module.exports = router

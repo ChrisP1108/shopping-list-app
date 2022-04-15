@@ -7,14 +7,13 @@ const { userVerify } = require('../../middleware/userMiddleware');
 // Get User Data
 
 const getUser = asyncHandler(async (req, res) => {
-    const { username } = req.body;
     
-    const userLogin = await User.find({ username });
+    const userLogin = await User.findById(req.params.id);
     if(!userLogin) {
         res.status(400);
         throw new Error('User Not Found')
     }
-
+    console.log(userLogin)
     const activeList = await ActiveList.find({ user: req.user.id })
     const shoppingList = await ShoppingList.find({ user: req.user.id })
     if (shoppingList.user) {
@@ -25,7 +24,7 @@ const getUser = asyncHandler(async (req, res) => {
     }
     
     res.status(200).json({ 
-        user: userLogin[0],
+        user: userLogin,
         activeShoppingList: [...activeList ],
         savedShoppingLists: [...shoppingList]
     });
