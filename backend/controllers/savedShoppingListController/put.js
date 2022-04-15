@@ -1,18 +1,19 @@
 const asyncHandler = require('express-async-handler');
 const { userVerify } = require('../../middleware/userMiddleware');
+const ShoppingList = require('../../models/shoppingListModel');
 
 // Update Shopping List By ID
 
-const putList = asyncHandler(async (req, res, ShoppingList) => {
+const putList = asyncHandler(async (req, res) => {
     const { name } = req.body
-    const shoppingList = await ShoppingList.find({ _id: req.params.id });
+    let shoppingList = await ShoppingList.find({ _id: req.params.id });
     
     if (!shoppingList) {
         res.status(400);
         throw new Error('Shopping List Not Found')
     }
 
-    if (!userVerify(req.user.id, shoppingList[0].user)) {
+    if (!userVerify(req.user.id, shoppingList.user)) {
         res.status(401);
         throw new Error('User Not Authorized')
     }
@@ -21,10 +22,10 @@ const putList = asyncHandler(async (req, res, ShoppingList) => {
         throw new Error('Shopping List Name Must Be Defined')
     }
 
-    shoppingList[0].name = name;
+    shoppingList.name = name;
 
     const updatedShoppingList = await ShoppingList
-        .findByIdAndUpdate(req.params.id, shoppingList[0], {new: true});
+        .findByIdAndUpdate(req.params.id, shoppingList, {new: true});
 
     let updatedRes = await ShoppingList.findById(req.params.id);
     res.status(200).json(updatedRes); 
@@ -32,19 +33,19 @@ const putList = asyncHandler(async (req, res, ShoppingList) => {
 
 // Update Shopping List Item By ID
 
-const putListItem = asyncHandler(async (req, res, ShoppingList) => {
+const putListItem = asyncHandler(async (req, res) => {
     const { name, quantity } = req.body
     
-    let shoppingListId = req._parsedUrl.pathname.slice(1);
-    shoppingListId = shoppingListId.slice(0, shoppingListId.indexOf('/'));
-    const shoppingList = await ShoppingList.find({ _id: shoppingListId });
+    const shoppingListId = req._parsedUrl.pathname.split('/')[1];
+    let shoppingList = await ShoppingList.find({ _id: shoppingListId });
+    shoppingList = shoppingList[0];
 
-    if (!shoppingList[0]) {
+    if (!shoppingList) {
         res.status(400);
         throw new Error('Shopping List Not Found')
     }
 
-    if (!userVerify(req.user.id, shoppingList[0].user)) {
+    if (!userVerify(req.user.id, shoppingList.user)) {
         res.status(401);
         throw new Error('User Not Authorized')
     }
@@ -54,7 +55,7 @@ const putListItem = asyncHandler(async (req, res, ShoppingList) => {
         throw new Error('Shopping List Item Must Have A Name And Quantity To Update')
     }
 
-    const shoppingListItem = shoppingList[0].items.find(item => 
+    const shoppingListItem = shoppingList.items.find(item => 
         item._id.toString() === req.params.id)
 
     if (!shoppingListItem) {
@@ -62,11 +63,11 @@ const putListItem = asyncHandler(async (req, res, ShoppingList) => {
         throw new Error('Shopping List Item Not Found')
     }
 
-    shoppingList[0].items = shoppingList[0].items.map(item => 
+    shoppingList.items = shoppingList.items.map(item => 
         item._id.toString() === shoppingListItem._id.toString() ? req.body : item);
 
     const updatedShoppingList = await ShoppingList
-        .findByIdAndUpdate(shoppingListId, shoppingList[0], {new: true});
+        .findByIdAndUpdate(shoppingListId, shoppingList, {new: true});
 
     let updatedRes = await ShoppingList.findById(shoppingListId);
     updatedRes = updatedRes.items.find(item => item.name === name);

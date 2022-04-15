@@ -1,35 +1,33 @@
 const express = require('express');
 const router = express.Router();
 
-const ShoppingList = require('../models/savedShoppingListModel');
-
-const { getLists, getList, getListItems, getListItem } = require('../controllers/template_listController/get');
-const { postList, postListItem } = require('../controllers/template_listController/post');
-const { putList, putListItem } = require('../controllers/template_listController/put');
-const { deleteList, deleteListItems, deleteListItem } = require('../controllers/template_listController/delete');
+const { getLists, getList, getListItems, getListItem } = require('../controllers/savedShoppingListController/get');
+const { postList, postListItem } = require('../controllers/savedShoppingListController/post');
+const { putList, putListItem } = require('../controllers/savedShoppingListController/put');
+const { deleteList, deleteListItems, deleteListItem } = require('../controllers/savedShoppingListController/delete');
 
 const { protect } = require('../middleware/authMiddleware');
 
-router.get('/', protect, (req, res) => getLists(req, res, ShoppingList));
+router.get('/', protect, getLists);
 
-router.get('/:id', protect, (req, res) => getList(req, res, ShoppingList));
+router.get('/:id', protect, getList);
 
-router.get('/:id/items', protect, (req, res) => getListItems(req, res, ShoppingList));
+router.get('/:id/items', protect, getListItems);
 
-router.get('/:id/items/:id', protect, (req, res) => getListItem(req, res, ShoppingList));
+router.get('/:id/items/:id', protect, getListItem);
 
-router.post('/', protect, (req, res) => postList(req, res, ShoppingList, true));
+router.post('/', protect, postList);
 
-router.post('/:id', protect, (req, res) => postListItem(req, res, ShoppingList));
+router.post('/:id', protect, postListItem);
 
-router.put('/:id', protect, (req, res) => putList(req, res, ShoppingList));
+router.put('/:id', protect, putList);
 
-router.put('/:id/items/:id', protect, (req, res) => putListItem(req, res, ShoppingList));
+router.put('/:id/items/:id', protect, putListItem);
 
-router.delete('/:id', protect, (req, res) => deleteList(req, res, ShoppingList));
+router.delete('/:id', protect, deleteList);
 
-router.delete('/:id/items', protect, (req, res) => deleteListItems(req, res, ShoppingList));
+router.delete('/:id/items', protect, deleteListItems);
 
-router.delete('/:id/items/:id', protect,(req, res) => deleteListItem(req, res, ShoppingList));
+router.delete('/:id/items/:id', protect, deleteListItem);
 
 module.exports = router;

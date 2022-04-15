@@ -1,7 +1,8 @@
 const asyncHandler = require('express-async-handler');
 const User = require('../../models/userModel');
-const ActiveShoppingList = require('../../models/activeShoppingListModel');
-const SavedShoppingList = require('../../models/savedShoppingListModel');
+const ActiveList = require('../../models/activeListModel');
+const ShoppingList = require('../../models/shoppingListModel');
+const { userVerify } = require('../../middleware/userMiddleware');
 
 // Get User Data
 
@@ -14,12 +15,19 @@ const getUser = asyncHandler(async (req, res) => {
         throw new Error('User Not Found')
     }
 
-    const activeList = await ActiveShoppingList.find({ user: req.user.id })
-    const savedList = await SavedShoppingList.find({ user: req.user.id })
+    const activeList = await ActiveList.find({ user: req.user.id })
+    const shoppingList = await ShoppingList.find({ user: req.user.id })
+    if (shoppingList.user) {
+        if (!userVerify(req.user.id, shoppingList[0].user)) {
+            res.status(401);
+            throw new Error('User Not Authorized')
+        }
+    }
+    
     res.status(200).json({ 
         user: userLogin[0],
         activeShoppingList: [...activeList ],
-        savedShoppingLists: [...savedList]
+        savedShoppingLists: [...shoppingList]
     });
 });
 
