@@ -18,7 +18,7 @@ const getList = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('Shopping List Not Found')
     }
-    if (!userVerify(req.user.id, shoppingList.user)) {
+    if (!userVerify(req.user, shoppingList)) {
         res.status(401);
         throw new Error('User Not Authorized')
     }
@@ -37,7 +37,7 @@ const getListItems = asyncHandler(async (req, res) => {
         throw new Error('Shopping List Not Found')
     }
 
-    if (!userVerify(req.user.id, shoppingList.user)) {
+    if (!userVerify(req.user, shoppingList)) {
         res.status(401);
         throw new Error('User Not Authorized')
     }
@@ -57,7 +57,7 @@ const getListItem = asyncHandler(async (req, res) => {
         throw new Error('Shopping List Not Found')
     }
 
-    if (!userVerify(req.user.id, shoppingList.user)) {
+    if (!userVerify(req.user, shoppingList)) {
         res.status(401);
         throw new Error('User Not Authorized')
     }

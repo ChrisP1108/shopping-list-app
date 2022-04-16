@@ -1,8 +1,8 @@
-function userVerify(a, b) {
-    if (!a || !b) {
+function userVerify(user, shoppingListUser) {
+    if (!user || !shoppingListUser) {
         return false
     }
-    return a.toString() === b.toString()
+    return user._id.toString() === shoppingListUser.user.toString()
 }
 
 module.exports = { userVerify }

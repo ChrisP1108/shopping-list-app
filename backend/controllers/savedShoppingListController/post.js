@@ -18,7 +18,7 @@ const postActiveList = asyncHandler(async (req, res) => {
         throw new Error('Shopping List ID Not Valid')
     }
 
-    if (!userVerify(req.user.id, shoppingList.user)) {
+    if (!userVerify(req.user, shoppingList)) {
         res.status(401);
         throw new Error('User Not Authorized')
     }
@@ -54,6 +54,10 @@ const postList = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('A Shopping List Name Must Be Provided')
     }
+    if (!req.user) {
+        res.status(400);
+        throw new Error('User Not Found. Possible Bad Token')
+    }
     const shoppingList = await ShoppingList.find({ user: req.user.id });
     if (shoppingList.some(list => list.name === name)) {
         res.status(400);
@@ -78,7 +82,7 @@ const postListItem = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('Shopping List Not Found')
     }
-    if (!userVerify(req.user.id, shoppingList.user)) {
+    if (!userVerify(req.user, shoppingList)) {
         res.status(401);
         throw new Error('User Not Authorized')
     }

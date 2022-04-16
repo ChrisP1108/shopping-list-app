@@ -1,7 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const { userVerify } = require('../../middleware/userMiddleware');
 const ShoppingList = require('../../models/shoppingListModel');
-const ActiveList = require('../../models/activeListModel');
 
 // Delete Shopping List Or Item By ID
 
@@ -14,7 +13,7 @@ const deleteList = asyncHandler(async (req, res) => {
         throw new Error('Shopping List Not Found')
     }
 
-    if (!userVerify(req.user.id, shoppingList.user)) {
+    if (!userVerify(req.user, shoppingList)) {
         res.status(401);
         throw new Error('User Not Authorized')
     }
@@ -34,7 +33,7 @@ const deleteListItems = asyncHandler(async (req, res) => {
         throw new Error('Shopping List Not Found')
     }
 
-    if (!userVerify(req.user._id, shoppingList.user)) {
+    if (!userVerify(req.user, shoppingList)) {
         res.status(401);
         throw new Error('User Not Authorized')
     }
@@ -47,24 +46,23 @@ const deleteListItems = asyncHandler(async (req, res) => {
 
 // Delete Shopping List Item By ID
 
-const deleteListItem = asyncHandler(async (req, res, ShoppingList) => {
+const deleteListItem = asyncHandler(async (req, res) => {
     const shoppingListId = req._parsedUrl.pathname.split('/')[1];
-    let shoppingList = await ShoppingList.find({ _id: shoppingListId });
-    shoppingList = shoppingList[0]
+    const shoppingList = await ShoppingList.findById(shoppingListId);
 
     if (!shoppingList) {
         res.status(400);
         throw new Error('Shopping List Not Found')
     }
 
-    if (!userVerify(req.user.id, shoppingList.user)) {
+    if (!userVerify(req.user, shoppingList)) {
         res.status(401);
         throw new Error('User Not Authorized')
     }
 
     const shoppingListItem = shoppingList.items.find(item => item._id.toString() === req.params.id)
 
-    if (!shoppingListItem._id.toString()) {
+    if (!shoppingListItem) {
         res.status(400);
         throw new Error('Shopping List Item Not Found')
     }

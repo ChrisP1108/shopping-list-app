@@ -9,7 +9,7 @@ const getActiveList = asyncHandler(async (req, res) => {
     const activeList = await ActiveList.find();
     
     if (activeList.length) {
-        if (!userVerify(req.user.id, activeList[0].user)) {
+        if (!userVerify(req.user, activeList.user)) {
             res.status(401);
             throw new Error('User Not Authorized')
         }

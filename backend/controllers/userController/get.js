@@ -7,22 +7,29 @@ const { userVerify } = require('../../middleware/userMiddleware');
 // Get User Data
 
 const getUser = asyncHandler(async (req, res) => {
+    const userLogin = await User.findById(req.user._id);
     
-    const userLogin = await User.findById(req.params.id);
     if(!userLogin) {
         res.status(400);
         throw new Error('User Not Found')
     }
-    console.log(userLogin)
+
+    userLogin.user = userLogin._id
+
+    if (!userVerify(req.user, userLogin)) {
+        res.status(401);
+        throw new Error('User Not Authorized')
+    }
+
     const activeList = await ActiveList.find({ user: req.user.id })
     const shoppingList = await ShoppingList.find({ user: req.user.id })
     if (shoppingList.user) {
-        if (!userVerify(req.user.id, shoppingList[0].user)) {
+        if (!userVerify(req.user, shoppingList[0])) {
             res.status(401);
             throw new Error('User Not Authorized')
         }
     }
-    
+    userLogin.password = "Protected";
     res.status(200).json({ 
         user: userLogin,
         activeShoppingList: [...activeList ],

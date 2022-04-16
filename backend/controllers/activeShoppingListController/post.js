@@ -18,7 +18,7 @@ const postActiveList = asyncHandler(async (req, res) => {
         throw new Error('Shopping List ID Not Valid')
     }
 
-    if (!userVerify(req.user.id, shoppingList.user)) {
+    if (!userVerify(req.user, shoppingList)) {
         res.status(401);
         throw new Error('User Not Authorized')
     }

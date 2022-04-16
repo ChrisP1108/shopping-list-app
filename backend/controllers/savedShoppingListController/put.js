@@ -7,13 +7,14 @@ const ShoppingList = require('../../models/shoppingListModel');
 const putList = asyncHandler(async (req, res) => {
     const { name } = req.body
     let shoppingList = await ShoppingList.find({ _id: req.params.id });
-    
+    shoppingList = shoppingList[0];
+
     if (!shoppingList) {
         res.status(400);
         throw new Error('Shopping List Not Found')
     }
 
-    if (!userVerify(req.user.id, shoppingList.user)) {
+    if (!userVerify(req.user, shoppingList)) {
         res.status(401);
         throw new Error('User Not Authorized')
     }
@@ -21,14 +22,20 @@ const putList = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('Shopping List Name Must Be Defined')
     }
-
+    if (shoppingList.name === name) {
+        res.status(400);
+        throw new Error('Shopping List Already Has The Same Name')
+    }
+    const checkForDuplicates = await ShoppingList.find({user: req.user.id});
+    if (checkForDuplicates.some(item => item.name === name)) {
+        res.status(400);
+        throw new Error('Another Shopping List Item Has The Same Name')
+    }
     shoppingList.name = name;
-
     const updatedShoppingList = await ShoppingList
         .findByIdAndUpdate(req.params.id, shoppingList, {new: true});
 
-    let updatedRes = await ShoppingList.findById(req.params.id);
-    res.status(200).json(updatedRes); 
+    res.status(200).json(updatedShoppingList); 
 });
 
 // Update Shopping List Item By ID
@@ -45,7 +52,7 @@ const putListItem = asyncHandler(async (req, res) => {
         throw new Error('Shopping List Not Found')
     }
 
-    if (!userVerify(req.user.id, shoppingList.user)) {
+    if (!userVerify(req.user, shoppingList)) {
         res.status(401);
         throw new Error('User Not Authorized')
     }
@@ -61,6 +68,11 @@ const putListItem = asyncHandler(async (req, res) => {
     if (!shoppingListItem) {
         res.status(400);
         throw new Error('Shopping List Item Not Found')
+    }
+
+    if (shoppingList.items.some(item => item.name === req.body.name)) {
+        res.status(400);
+        throw new Error('A Shopping List Item Already Has The Same Name');
     }
 
     shoppingList.items = shoppingList.items.map(item => 

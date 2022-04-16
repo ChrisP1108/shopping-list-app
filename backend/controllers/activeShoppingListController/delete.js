@@ -7,7 +7,7 @@ const ActiveList = require('../../models/activeListModel');
 const deleteActiveList = asyncHandler(async (req, res) => {
     const activeList = await ActiveList.find();
 
-    if (!userVerify(req.user.id, activeList[0].user)) {
+    if (!userVerify(req.user, activeList[0])) {
         res.status(401);
         throw new Error('User Not Authorized')
     }
