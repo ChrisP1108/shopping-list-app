@@ -2,6 +2,26 @@ const asyncHandler = require('express-async-handler');
 const { userVerify } = require('../../middleware/userMiddleware');
 const ShoppingList = require('../../models/shoppingListModel');
 
+
+// Delete All Shopping Lists
+
+const deleteAllLists = asyncHandler(async (req, res) => {
+    const shoppingLists = await ShoppingList.find({ user: req.user.id });
+
+    if (!shoppingLists) {
+        res.status(400);
+        throw new Error('No Shopping Lists Were Not Found')
+    }
+
+    if (!userVerify(req.user, shoppingLists[0])) {
+        res.status(401);
+        throw new Error('User Not Authorized')
+    }
+
+    await shoppingLists.remove();
+    res.status(200).json([]);
+});
+
 // Delete Shopping List Or Item By ID
 
 const deleteList = asyncHandler(async (req, res) => {
@@ -75,6 +95,7 @@ const deleteListItem = asyncHandler(async (req, res) => {
 });
 
 module.exports = { 
+    deleteAllLists,
     deleteList, 
     deleteListItems, 
     deleteListItem 

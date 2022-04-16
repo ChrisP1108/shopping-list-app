@@ -7,6 +7,10 @@ const { userVerify } = require('../../middleware/userMiddleware');
 // Get User Data
 
 const getUser = asyncHandler(async (req, res) => {
+    if (!req.user) {
+        res.status(400);
+        throw new Error('User Not Found')
+    }
     const userLogin = await User.findById(req.user._id);
     
     if(!userLogin) {

@@ -7,9 +7,8 @@ const ShoppingList = require('../../models/shoppingListModel');
 
 const getActiveList = asyncHandler(async (req, res) => {
     const activeList = await ActiveList.find();
-    
     if (activeList.length) {
-        if (!userVerify(req.user, activeList.user)) {
+        if (!userVerify(req.user, activeList[0])) {
             res.status(401);
             throw new Error('User Not Authorized')
         }

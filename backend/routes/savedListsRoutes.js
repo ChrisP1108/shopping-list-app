@@ -4,7 +4,7 @@ const router = express.Router();
 const { getLists, getList, getListItems, getListItem } = require('../controllers/savedShoppingListController/get');
 const { postList, postListItem } = require('../controllers/savedShoppingListController/post');
 const { putList, putListItem } = require('../controllers/savedShoppingListController/put');
-const { deleteList, deleteListItems, deleteListItem } = require('../controllers/savedShoppingListController/delete');
+const { deleteAllLists, deleteList, deleteListItems, deleteListItem } = require('../controllers/savedShoppingListController/delete');
 
 const { protect } = require('../middleware/authMiddleware');
 
@@ -23,6 +23,8 @@ router.post('/:id', protect, postListItem);
 router.put('/:id', protect, putList);
 
 router.put('/:id/items/:id', protect, putListItem);
+
+router.delete('/', protect, deleteAllLists);
 
 router.delete('/:id', protect, deleteList);
 

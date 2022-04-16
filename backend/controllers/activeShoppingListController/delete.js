@@ -6,7 +6,10 @@ const ActiveList = require('../../models/activeListModel');
 
 const deleteActiveList = asyncHandler(async (req, res) => {
     const activeList = await ActiveList.find();
-
+    if (!activeList.length) {
+        res.status(400);
+        throw new Error('Active Shopping List Already Empty')
+    }
     if (!userVerify(req.user, activeList[0])) {
         res.status(401);
         throw new Error('User Not Authorized')
