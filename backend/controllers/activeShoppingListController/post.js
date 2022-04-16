@@ -9,6 +9,16 @@ const User = require('../../models/userModel');
 const postActiveList = asyncHandler(async (req, res) => {
     const { user, activeShoppingList } = req.body;
 
+    if (!user) {
+        res.status(400);
+        throw new Error('A User ID Must Be Provided')
+    }
+
+    if (!activeShoppingList) {
+        res.status(400);
+        throw new Error('A Shopping List ID Must Be Provided')
+    }
+
     const activeList = await ActiveList.find();
     const shoppingList = await ShoppingList.findById(activeShoppingList);
     const userId = await User.findById(user);

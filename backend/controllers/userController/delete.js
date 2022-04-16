@@ -8,8 +8,8 @@ const ShoppingList = require('../../models/shoppingListModel');
 
 const deleteUser = asyncHandler(async (req, res) => {    
     if (!req.user) {
-        res.status(401);
-        throw new Error('User Not Authorized')
+        res.status(400);
+        throw new Error('User Not Found. Possible Bad Token')
     }
     
     const userLogin = await User.findById(req.params.id);

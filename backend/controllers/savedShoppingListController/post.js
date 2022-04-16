@@ -6,13 +6,13 @@ const ShoppingList = require('../../models/shoppingListModel');
 
 const postList = asyncHandler(async (req, res) => {
     const { name, items } = req.body;
-    if (!name) {
-        res.status(400);
-        throw new Error('A Shopping List Name Must Be Provided')
-    }
     if (!req.user) {
         res.status(400);
         throw new Error('User Not Found. Possible Bad Token')
+    }
+    if (!name) {
+        res.status(400);
+        throw new Error('A Shopping List Name Must Be Provided')
     }
     const shoppingList = await ShoppingList.find({ user: req.user.id });
     if (shoppingList.some(list => list.name === name)) {

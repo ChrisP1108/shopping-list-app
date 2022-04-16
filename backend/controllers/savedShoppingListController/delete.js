@@ -6,6 +6,11 @@ const ShoppingList = require('../../models/shoppingListModel');
 // Delete All Shopping Lists
 
 const deleteAllLists = asyncHandler(async (req, res) => {
+    if (!req.user) {
+        res.status(400);
+        throw new Error('User Not Found. Possible Bad Token')
+    }
+
     const shoppingLists = await ShoppingList.find({ user: req.user.id });
 
     if (!shoppingLists) {

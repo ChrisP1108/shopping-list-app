@@ -5,6 +5,10 @@ const ShoppingList = require('../../models/shoppingListModel');
 // Get All Shopping Lists
 
 const getLists = asyncHandler(async (req, res) => {
+    if (!req.user) {
+        res.status(400);
+        throw new Error('User Not Found. Possible Bad Token')
+    }
     const shoppingList = await ShoppingList.find({ user: req.user.id });
     res.status(200).json(shoppingList);
 });
