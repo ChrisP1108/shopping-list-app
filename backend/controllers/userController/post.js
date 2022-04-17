@@ -1,12 +1,12 @@
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const asyncHandler = require('express-async-handler');
 const User = require('../../models/userModel');
+const { generateToken } = require('../../middleware/tokenMiddleware');
 
 // Register New User
 
 const postUserRegister = asyncHandler(async (req, res) => {
-    const { username, password } = req.body;
+    let { username, password, dob, firstName, pin, question, answer } = req.body;
 
     if (!username) {
         res.status(400);
@@ -26,7 +26,43 @@ const postUserRegister = asyncHandler(async (req, res) => {
             res.status(400);
             throw new Error('Password Cannot Have Spaces Or Be Less Than 8 Or Greater Than 15 Characters')
     }
-
+    if (!dob) {
+        res.status(400);
+        throw new Error('A User Date Of Birth Must Be Provided To Register User')
+    }
+    if (!firstName) {
+        res.status(400);
+        throw new Error('A User First Name Must Be Provided To Register User')
+    }
+    if (firstName.includes(' ')) {
+        res.status(400);
+        throw new Error('A User First Name Cannot Have Spaces')
+    }
+    if (!pin) {
+        res.status(400);
+        throw new Error('A User 4 Digit Pin Must Be Provided To Register User')
+    }
+    pin = pin.toString();
+    if (pin.length > 4 || pin.length < 4) {
+        res.status(400);
+        throw new Error('A User Last Name Must Be Provided To Register User')
+    }
+    if (!question) {
+        res.status(400);
+        throw new Error('A Unique User Recover Security Question Must Be Provided')
+    }
+    if (question.length > 50 || question.length < 8) {
+        res.status(400);
+        throw new Error('User Recovery Question Cannot Be Less Than 8 Or Greater Than 50 Characters')
+    }
+    if (!answer) {
+        res.status(400);
+        throw new Error('A Unique User Recover Security Answer Must Be Provided')
+    }
+    if (answer.includes(' ') || answer.length > 15 || answer.length < 8) {
+        res.status(400);
+        throw new Error('User Recovery Answer Cannot Have Spaces Or Be Less Than 8 Or Greater Than 15 Characters')
+    }
     const userExists = await User.findOne({username})
     if (userExists) {
         res.status(400);
@@ -34,24 +70,33 @@ const postUserRegister = asyncHandler(async (req, res) => {
     }
 
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt)
+    const hashedPassword = await bcrypt.hash(password.toLowerCase(), salt);
+    const hashedPin = await bcrypt.hash(pin, salt);
+    const hashedAnswer = await bcrypt.hash(answer.toLowerCase(), salt);
 
     const userCreate = await User.create({
-        username: username,
-        password: hashedPassword
+        username: username.toLowerCase(),
+        password: hashedPassword,
+        firstName: firstName[0].toUpperCase() + firstName.slice(1).toLowerCase(),
+        recovery: {
+            dob: dob.toLowerCase(),
+            pin: hashedPin,
+            question,
+            answer: hashedAnswer
+        }
     });
 
     if (userCreate) {
         res.status(201).json({
             _id: userCreate.id,
             username: userCreate.username,
+            firstName: userCreate.firstName,
             token: generateToken(userCreate._id)
         });
     } else {
-        res.status(400);
-        throw new Error('Error Occured When Registering User')
+        res.status(500);
+        throw new Error('An Error Occured When Registering User')
     }
-    
 });
 
 // User Login
@@ -79,21 +124,67 @@ const postUserLogin = asyncHandler(async (req, res) => {
         throw new Error('Invalid Password')
     }
     res.status(200).json({
-        _id: user.id,
+        _id: user._id,
         username: user.username,
         token: generateToken(user._id)
     });
 });
 
-// Generate JWT
+// User Login Credentials Recovery Initialization
 
-const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: '30d'
-    })
-}
+const postUserRecoveryInit = asyncHandler(async (req, res) => {
+    let { firstName, dob, pin } = req.body;
+
+    if (!dob) {
+        res.status(400);
+        throw new Error('A User Date Of Birth Must Be Provided To Recover User Credentials')
+    }
+    if (!firstName) {
+        res.status(400);
+        throw new Error('A User First Name Must Be Provided To Recover User Credentials')
+    }
+    if (!pin) {
+        res.status(400);
+        throw new Error('A User 4 Digit Pin Must Be Provided')
+    }
+
+    pin = pin.toString();
+    
+    const userSearch = await User.find( 
+        { firstName: firstName[0].toUpperCase() + firstName.slice(1).toLowerCase() },
+        { recovery: {
+            dob: dob,
+            }
+        }
+    );
+
+    if(!userSearch || !userSearch.length) {
+        res.status(400);
+        throw new Error('User Not Found.  Check First Name And Date Of Birth')
+    }
+
+    const user = await User.findById(userSearch[0]._id)
+
+    if (!await bcrypt.compare(pin, user.recovery.pin)) {
+        res.status(400);
+        throw new Error('Invalid User PIN')
+    } 
+    const userUpdate = await User
+        .findByIdAndUpdate(user._id, user, {new: true});
+    if (userUpdate) {
+        userUpdate.password = "Protected";
+        userUpdate.recovery.dob = "Protected";
+        userUpdate.recovery.pin = "Protected";
+        userUpdate.recovery.answer = "Protected";
+        res.status(200).json(userUpdate);
+    } else {
+        res.status(500);
+        throw new Error('An Error Occured When Updating User Credentials')
+    }
+});
 
 module.exports = {
     postUserRegister,
-    postUserLogin
+    postUserLogin,
+    postUserRecoveryInit
 }
