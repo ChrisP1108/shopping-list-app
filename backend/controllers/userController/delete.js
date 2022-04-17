@@ -38,7 +38,6 @@ const deleteUser = asyncHandler(async (req, res) => {
     const userRemoved = await User.findById(req.params.id);
     const activeListRemoved = await ActiveList.find({ user: req.user.id });
     const shoppingListsRemoved = await ShoppingList.find({ user: req.user.id });
-    console.log(userRemoved, activeListRemoved.length, shoppingListsRemoved.length)
     if (userRemoved || activeListRemoved.length || shoppingListsRemoved.length) {
         res.status(400);
         throw new Error('Failed To Remove User')

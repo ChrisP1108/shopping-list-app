@@ -2,7 +2,7 @@ const asyncHandler = require('express-async-handler');
 const { userVerify } = require('../../middleware/userMiddleware');
 const ShoppingList = require('../../models/shoppingListModel');
 
-// Update Shopping List By ID
+// Update Shopping List Name By ID
 
 const putList = asyncHandler(async (req, res) => {
     const { name } = req.body

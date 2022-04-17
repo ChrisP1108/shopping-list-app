@@ -2,7 +2,6 @@ const asyncHandler = require('express-async-handler');
 const { userVerify } = require('../../middleware/userMiddleware');
 const ShoppingList = require('../../models/shoppingListModel');
 
-
 // Delete All Shopping Lists
 
 const deleteAllLists = asyncHandler(async (req, res) => {

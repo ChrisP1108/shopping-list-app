@@ -1,12 +1,15 @@
 const asyncHandler = require('express-async-handler');
 const { userVerify } = require('../../middleware/userMiddleware');
 const ActiveList = require('../../models/activeListModel');
-const ShoppingList = require('../../models/shoppingListModel');
 
 // Get Active List
 
 const getActiveList = asyncHandler(async (req, res) => {
-    const activeList = await ActiveList.find();
+    if (!req.user) {
+        res.status(401);
+        throw new Error('User Not Authorized')
+    }
+    const activeList = await ActiveList.find({ user: req.user.id });
     if (activeList.length) {
         if (!userVerify(req.user, activeList[0])) {
             res.status(401);
