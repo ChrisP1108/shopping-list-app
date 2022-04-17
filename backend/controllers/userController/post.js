@@ -6,7 +6,7 @@ const { generateToken } = require('../../middleware/tokenMiddleware');
 // Register New User
 
 const postUserRegister = asyncHandler(async (req, res) => {
-    let { username, password, dob, firstName, pin, question, answer } = req.body;
+    let { username, password, email, dob, firstName, pin, question, answer } = req.body;
 
     if (!username) {
         res.status(400);
@@ -25,6 +25,14 @@ const postUserRegister = asyncHandler(async (req, res) => {
         || password.length > 15 || password.length < 8) {
             res.status(400);
             throw new Error('Password Cannot Have Spaces Or Be Less Than 8 Or Greater Than 15 Characters')
+    }
+    if (!email) {
+        res.status(400);
+        throw new Error('A User Email Must Be Provided')
+    }
+    if (email.includes(' ') || !email.includes('@') || email.length < 8) {
+            res.status(400);
+            throw new Error('Email Cannot Have Spaces Or Be Less Than 8 And Must Have @')
     }
     if (!dob) {
         res.status(400);
@@ -78,8 +86,9 @@ const postUserRegister = asyncHandler(async (req, res) => {
         username: username.toLowerCase(),
         password: hashedPassword,
         firstName: firstName[0].toUpperCase() + firstName.slice(1).toLowerCase(),
+        email: email.toLowerCase(),
         recovery: {
-            dob: dob.toLowerCase(),
+            dob: dob.toString().toLowerCase(),
             pin: hashedPin,
             question,
             answer: hashedAnswer
@@ -91,6 +100,7 @@ const postUserRegister = asyncHandler(async (req, res) => {
             _id: userCreate.id,
             username: userCreate.username,
             firstName: userCreate.firstName,
+            email: userCreate.email,
             token: generateToken(userCreate._id)
         });
     } else {
@@ -133,7 +143,7 @@ const postUserLogin = asyncHandler(async (req, res) => {
 // User Login Credentials Recovery Initialization
 
 const postUserRecoveryInit = asyncHandler(async (req, res) => {
-    let { firstName, dob, pin } = req.body;
+    let { firstName, email, dob, pin } = req.body;
 
     if (!dob) {
         res.status(400);
@@ -142,6 +152,10 @@ const postUserRecoveryInit = asyncHandler(async (req, res) => {
     if (!firstName) {
         res.status(400);
         throw new Error('A User First Name Must Be Provided To Recover User Credentials')
+    }
+    if (!email) {
+        res.status(400);
+        throw new Error('A User Email Must Be Provided To Recover User Credentials')
     }
     if (!pin) {
         res.status(400);
@@ -153,22 +167,28 @@ const postUserRecoveryInit = asyncHandler(async (req, res) => {
     const userSearch = await User.find( 
         { firstName: firstName[0].toUpperCase() + firstName.slice(1).toLowerCase() },
         { recovery: {
-            dob: dob,
+            dob: dob
             }
-        }
+        },
+        { email: email}
     );
 
-    if(!userSearch || !userSearch.length) {
+    if (!userSearch || !userSearch.length) {
         res.status(400);
-        throw new Error('User Not Found.  Check First Name And Date Of Birth')
+        throw new Error('User Not Found')
     }
 
     const user = await User.findById(userSearch[0]._id)
 
+    if (user.email !== email.toLowerCase() || user.recovery.dob !== dob.toString().toLowerCase()
+        || user.firstName.toLowerCase() !== firstName.toLowerCase()) {
+            res.status(401);
+            throw new Error('Invalid User Credentials Provided');
+    }
     if (!await bcrypt.compare(pin, user.recovery.pin)) {
-        res.status(400);
-        throw new Error('Invalid User PIN')
-    } 
+            res.status(401);
+            throw new Error('Invalid User Credentials Provided');
+    }
     const userUpdate = await User
         .findByIdAndUpdate(user._id, user, {new: true});
     if (userUpdate) {

@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs/dist/bcrypt');
 // Update User Credentials
 
 const putUserUpdate = asyncHandler(async (req, res) => {
-    const { username, password, dob, firstName, pin, question, answer } = req.body;
+    const { username, password, dob, firstName, email, pin, question, answer } = req.body;
 
     if (!username) {
         res.status(400);
@@ -26,6 +26,14 @@ const putUserUpdate = asyncHandler(async (req, res) => {
         || password.length > 15 || password.length < 8) {
             res.status(400);
             throw new Error('Password Cannot Have Spaces Or Be Less Than 8 Or Greater Than 15 Characters')
+    }
+    if (!email) {
+        res.status(400);
+        throw new Error('A User Email Must Be Provided')
+    }
+    if (email.includes(' ') || !email.includes('@') || email.length < 8) {
+            res.status(400);
+            throw new Error('Email Cannot Have Spaces Or Be Less Than 8 And Must Have @')
     }
     if (!dob) {
         res.status(400);
@@ -47,6 +55,7 @@ const putUserUpdate = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('A User Last Name Must Be Provided To Register User')
     }
+    pin = pin.toString();
     if (!question) {
         res.status(400);
         throw new Error('A Unique User Recover Security Question Must Be Provided')
@@ -82,16 +91,16 @@ const putUserUpdate = asyncHandler(async (req, res) => {
     const salt = await bcrypt.genSalt(10);
 
     const hashedPassword = await bcrypt.hash(password.toLowerCase(), salt);
-    const hashedPin = await bcrypt.hash(Number(pin), salt);
-    const hashedDob = await bcrypt.hash(dob.toLowerCase(), salt);
+    const hashedPin = await bcrypt.hash(pin, salt);
     const hashedAnswer = await bcrypt.hash(answer.toLowerCase(), salt);
     
     const updatedUser = {
         username: username.toLowerCase(),
         password: hashedPassword,
         firstName: firstName[0].toUpperCase() + firstName.slice(1).toLowerCase(),
+        email: email.toLowerCase(),
         recovery: {
-            dob: hashedDob,
+            dob: dob.toString().toLowerCase(),
             pin: hashedPin,
             question,
             answer: hashedAnswer
@@ -106,6 +115,7 @@ const putUserUpdate = asyncHandler(async (req, res) => {
             _id: userUpdate.id,
             username: userUpdate.username,
             firstName: userUpdate.firstName,
+            email: userUpdate.email,
             token: generateToken(userCreate._id)
         });
     } else {
@@ -117,7 +127,7 @@ const putUserUpdate = asyncHandler(async (req, res) => {
 // Finish Recovery Of Login Credentials From Provided User ID And Question
 
 const putUserRecoveryComplete = asyncHandler(async (req, res) => {
-    let { password, dob, firstName, pin, question, answer } = req.body;
+    let { password, dob, pin, firstName, email, question, answer } = req.body;
 
     if (!dob) {
         res.status(400);
@@ -126,6 +136,10 @@ const putUserRecoveryComplete = asyncHandler(async (req, res) => {
     if (!firstName) {
         res.status(400);
         throw new Error('A User First Name Must Be Provided To Recover Login Credentials')
+    }
+    if (!email) {
+        res.status(400);
+        throw new Error('A User Email Must Be Provided To Recover User Credentials')
     }
     if (!pin) {
         res.status(400);
@@ -138,15 +152,11 @@ const putUserRecoveryComplete = asyncHandler(async (req, res) => {
     }
     if (!answer) {
         res.status(400);
-        throw new Error('User Answer To Security Question Must Be Provided To Recover Answer')
-    }
-    if (answer.includes(' ') || answer.length > 15 || answer.length < 8) {
-        res.status(400);
-        throw new Error('User Recovery Answer Cannot Have Spaces Or Be Less Than 8 Or Greater Than 15 Characters')
+        throw new Error('User Answer To Security Question Must Be Provided To Recover Login Credentials')
     }
     if (!password) {
         res.status(400);
-        throw new Error('A Password Must Be Provided To Update User Credentials')
+        throw new Error('A Password Must Be Provided To Update User Login Credentials')
     }
     if (password.includes(' ') 
         || password.length > 15 || password.length < 8) {
@@ -161,23 +171,35 @@ const putUserRecoveryComplete = asyncHandler(async (req, res) => {
         throw new Error('User Not Found')
     }
 
-    if (!await bcrypt.compare(answer, user.recovery.answer)) {
+    if (user.email !== email.toLowerCase() || user.recovery.dob !== dob.toString().toLowerCase()
+        || user.firstName.toLowerCase() !== firstName.toLowerCase()
+        || user.recovery.question.toLowerCase() !== question.toLowerCase()) {
+            res.status(401);
+            throw new Error('Invalid User Credentials Provided');
+    }
+
+    if (!await bcrypt.compare(pin.toString(), user.recovery.pin)) {
         res.status(401);
-        throw new Error('Answer To Security Question Is Incorrect')
+        throw new Error('Invalid User Credentials Provided')
+    }
+
+    if (!await bcrypt.compare(answer.toLowerCase(), user.recovery.answer)) {
+        res.status(401);
+        throw new Error('Invalid User Credentials Provided')
     }
 
     const salt = await bcrypt.genSalt(10);
 
     const hashedPassword = await bcrypt.hash(password.toLowerCase(), salt);
-    const hashedPin = await bcrypt.hash(pin, salt)
 
     const updatedUser = {
         username: user.username,
         password: hashedPassword,
         firstName: user.firstName,
+        email: user.email,
         recovery: {
             dob: user.recovery.dob,
-            pin: hashedPin,
+            pin: user.recovery.pin,
             question: user.recovery.question,
             answer: user.recovery.answer
         }
@@ -190,6 +212,8 @@ const putUserRecoveryComplete = asyncHandler(async (req, res) => {
         res.status(200).json({
             _id: userUpdate.id,
             username: user.username,
+            firstName: user.firstName,
+            email: user.email,
             token: generateToken(userUpdate.id)
         });
     } else {

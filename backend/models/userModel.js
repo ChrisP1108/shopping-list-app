@@ -16,6 +16,11 @@ const userSchema = mongoose.Schema({
         required: [true, 'A User First Name Must Be Provided'],
         unique: true
     },
+    email: {
+        type: String,
+        required: [true, 'A User Email Must Be Provided'],
+        unique: true
+    },
     recovery: {
         dob: {
             type: String,
