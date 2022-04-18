@@ -55,7 +55,7 @@ const deleteList = asyncHandler(async (req, res) => {
     const activeList = await ActiveList.find({ activeShoppingList: req.params.id });
 
     if (activeList.length) {
-        activeList[0].remove();
+        await activeList[0].remove();
         const deletedActiveVerify = await ActiveList.find({ activeShoppingList: req.params.id });
         if (deletedActiveVerify.length) {
             res.status(500);
