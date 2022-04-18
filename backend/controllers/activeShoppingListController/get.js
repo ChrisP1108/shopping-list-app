@@ -17,7 +17,7 @@ const getActiveList = asyncHandler(async (req, res) => {
         }
     }
 
-    res.status(200).json(activeList);
+    res.status(200).json(activeList[0]);
 });
 
 module.exports = { getActiveList }

@@ -47,12 +47,21 @@ const postActiveList = asyncHandler(async (req, res) => {
 
     if (!activeList.length) {
         activeListCreate = await ActiveList.create(output);
-        res.status(200).json(activeListCreate)
+        if (activeListCreate) {
+            res.status(201).json(activeListCreate);
+        } else {
+            res.status(500);
+            throw new Error('An Error Occured When Setting Active List')
+        }  
     } else {
         activeListCreate = await ActiveList
             .findByIdAndUpdate(activeList._id, output, { new: true });
-        const outputList = await ActiveList.find();
-        res.status(200).json(outputList)
+        if (activeListCreate) {
+            res.status(201).json(activeListCreate);
+        } else {
+            res.status(500);
+            throw new Error('An Error Occured When Updating Active List')
+        }  
     }
 });
 

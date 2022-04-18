@@ -37,9 +37,10 @@ const getUser = asyncHandler(async (req, res) => {
     userLogin.recovery.pin = "Protected";
     userLogin.recovery.answer = "Protected"; 
 
+
     res.status(200).json({ 
         user: userLogin,
-        activeShoppingList: [...activeList ],
+        activeShoppingList: activeList[0],
         savedShoppingLists: [...shoppingList]
     });
 });

@@ -24,8 +24,13 @@ const postList = asyncHandler(async (req, res) => {
         user: req.user.id,
         name: name,
         items: items
-    })
-    res.status(200).json(shoppingListCreate)
+    });
+    if (shoppingListCreate.length) {
+        res.status(201).json(shoppingListCreate);
+    } else {
+        res.status(500);
+        throw new Error('An Error Occured When Adding Shopping List')
+    }  
 });
 
 // Add Shopping List Item
@@ -58,9 +63,12 @@ const postListItem = asyncHandler(async (req, res) => {
     const updatedShoppingList = await ShoppingList
         .findByIdAndUpdate(req.params.id, shoppingList, {new: true});
     
-    let updatedRes = await ShoppingList.findById(req.params.id);
-    updatedRes = updatedRes.items.find(item => item.name === name);
-    res.status(200).json(updatedRes); 
+    if (updatedShoppingList.items.some(item => item.name === name)) {
+        res.status(201).json(updatedShoppingList.items);
+    } else {
+        res.status(500);
+        throw new Error('An Error Occured When Adding Shopping List Item')
+    }  
 });
 
 module.exports = {

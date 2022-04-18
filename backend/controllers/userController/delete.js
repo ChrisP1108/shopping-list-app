@@ -39,7 +39,7 @@ const deleteUser = asyncHandler(async (req, res) => {
     const activeListRemoved = await ActiveList.find({ user: req.user.id });
     const shoppingListsRemoved = await ShoppingList.find({ user: req.user.id });
     if (userRemoved || activeListRemoved.length || shoppingListsRemoved.length) {
-        res.status(400);
+        res.status(500);
         throw new Error('Failed To Remove User')
     } else res.status(200).json({ id: req.params.id });
 });

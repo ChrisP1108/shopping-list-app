@@ -34,8 +34,12 @@ const putList = asyncHandler(async (req, res) => {
     shoppingList.name = name;
     const updatedShoppingList = await ShoppingList
         .findByIdAndUpdate(req.params.id, shoppingList, {new: true});
-
-    res.status(200).json(updatedShoppingList); 
+    if (updatedShoppingList) {
+        res.status(200).json(updatedShoppingList);
+    } else {
+        res.status(500);
+        throw new Error('An Error Occured When Adding Shopping List Item')
+    }  
 });
 
 // Update Shopping List Item By ID
@@ -80,10 +84,12 @@ const putListItem = asyncHandler(async (req, res) => {
 
     const updatedShoppingList = await ShoppingList
         .findByIdAndUpdate(shoppingListId, shoppingList, {new: true});
-
-    let updatedRes = await ShoppingList.findById(shoppingListId);
-    updatedRes = updatedRes.items.find(item => item.name === name);
-    res.status(200).json(updatedRes); 
+    if (updatedShoppingList.items.some(item => item.name === name)) {
+        res.status(200).json(updatedShoppingList.items.find(item => item.name === name));
+    } else {
+        res.status(500);
+        throw new Error('An Error Occured When Adding Shopping List Item')
+    }  
 });
 
 module.exports = { 

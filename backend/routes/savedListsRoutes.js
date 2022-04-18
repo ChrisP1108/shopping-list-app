@@ -18,7 +18,7 @@ router.get('/:id/items/:id', protect, getListItem);
 
 router.post('/', protect, postList);
 
-router.post('/:id', protect, postListItem);
+router.post('/:id/items', protect, postListItem);
 
 router.put('/:id', protect, putList);
 
