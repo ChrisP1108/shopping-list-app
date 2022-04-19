@@ -8,6 +8,11 @@ const bcrypt = require('bcryptjs/dist/bcrypt');
 
 const putUserUpdate = asyncHandler(async (req, res) => {
     const { username, password, dob, firstName, email, pin, question, answer } = req.body;
+    
+    if (!req.user) {
+        res.status(400);
+        throw new Error('User Not Found. Possible Bad Token')
+    }
 
     if (!username) {
         res.status(400);

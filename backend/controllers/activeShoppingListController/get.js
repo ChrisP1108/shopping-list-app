@@ -15,9 +15,8 @@ const getActiveList = asyncHandler(async (req, res) => {
             res.status(401);
             throw new Error('User Not Authorized')
         }
-    }
-
-    res.status(200).json(activeList[0]);
+        res.status(200).json(activeList[0]);
+    } else res.status(200).json({});
 });
 
 module.exports = { getActiveList }

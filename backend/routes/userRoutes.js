@@ -13,11 +13,11 @@ router.post('/register', postUserRegister); // Register New User
 
 router.post('/login', postUserLogin); // User Login
 
-router.post('/recover', postUserRecoveryInit); // Initialize Recover User Login Getting ID And Question To Recover Credentials
+router.post('/recover', postUserRecoveryInit); // User Login Credentials Recovery Initialization
 
 router.put('/:id', protect, putUserUpdate); // Update User Credentials
 
-router.put('/recover/:id', putUserRecoveryComplete) // Finish Recover User Login Providing ID, Answer And Setting New Password
+router.put('/recover/:id', putUserRecoveryComplete) // Finish Recovery Of Login Credentials From Provided User ID And Question
 
 router.delete('/:id', protect, deleteUser); // Delete User
 

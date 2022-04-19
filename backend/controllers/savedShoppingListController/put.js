@@ -6,8 +6,13 @@ const ShoppingList = require('../../models/shoppingListModel');
 
 const putList = asyncHandler(async (req, res) => {
     const { name } = req.body
-    let shoppingList = await ShoppingList.find({ _id: req.params.id });
-    shoppingList = shoppingList[0];
+    
+    if (!req.user) {
+        res.status(400);
+        throw new Error('User Not Found. Possible Bad Token')
+    }
+    
+    const shoppingList = await ShoppingList.findById(req.params.id);
 
     if (!shoppingList) {
         res.status(400);
@@ -42,14 +47,15 @@ const putList = asyncHandler(async (req, res) => {
     }  
 });
 
-// Update Shopping List Item By ID
+// Reset Shopping List Items Checked Values To False
 
-const putListItem = asyncHandler(async (req, res) => {
-    const { name, quantity } = req.body
+const putResetItemsChecked = asyncHandler(async (req, res) => {
+    if (!req.user) {
+        res.status(400);
+        throw new Error('User Not Found. Possible Bad Token')
+    }
     
-    const shoppingListId = req._parsedUrl.pathname.split('/')[1];
-    let shoppingList = await ShoppingList.find({ _id: shoppingListId });
-    shoppingList = shoppingList[0];
+    const shoppingList = await ShoppingList.findById(req.params.id);
 
     if (!shoppingList) {
         res.status(400);
@@ -60,10 +66,57 @@ const putListItem = asyncHandler(async (req, res) => {
         res.status(401);
         throw new Error('User Not Authorized')
     }
+    if (shoppingList.items.length) {
+        shoppingList.items = shoppingList.items.map(item => ({ ...item, checked: false }));
+    }
+    const updatedShoppingList = await ShoppingList
+        .findByIdAndUpdate(req.params.id, shoppingList, {new: true});
+    if (updatedShoppingList) {
+        res.status(200).json(updatedShoppingList.items);
+    } else {
+        res.status(500);
+        throw new Error('An Error Occured When Adding Shopping List Item')
+    }  
+});
 
-    if(!req.body || !name || !quantity) {
+// Update Shopping List Item By ID
+
+const putListItem = asyncHandler(async (req, res) => {
+    const {name, quantity, category, description, checked } = req.body
+    
+    if (!req.user) {
         res.status(400);
-        throw new Error('Shopping List Item Must Have A Name And Quantity To Update')
+        throw new Error('User Not Found. Possible Bad Token')
+    }
+
+    const shoppingListId = req._parsedUrl.pathname.split('/')[1];
+    const shoppingList = await ShoppingList.findById(shoppingListId);
+
+    if (!shoppingList) {
+        res.status(400);
+        throw new Error('Shopping List Not Found')
+    }
+
+    if (!userVerify(req.user, shoppingList)) {
+        res.status(401);
+        throw new Error('User Not Authorized')
+    }
+    if (!name) {
+        res.status(400);
+        throw new Error('A Shopping List Item Name Must Be Provided')
+    }
+    if (!quantity) {
+        res.status(400);
+        throw new Error('A Shopping List Item Quantity Must Be Provided')
+    }
+    if (!category || category.startsWith(' ')) {
+        req.body.category = "Other";
+    }
+    if (!description || description.startsWith(' ')) {
+        req.body.description = "";
+    }
+    if (!checked) {
+        req.body.checked = false;
     }
 
     const shoppingListItem = shoppingList.items.find(item => 
@@ -94,5 +147,6 @@ const putListItem = asyncHandler(async (req, res) => {
 
 module.exports = { 
     putList, 
+    putResetItemsChecked,
     putListItem 
 }

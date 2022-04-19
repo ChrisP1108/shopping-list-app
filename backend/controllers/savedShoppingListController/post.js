@@ -36,10 +36,16 @@ const postList = asyncHandler(async (req, res) => {
 // Add Shopping List Item
 
 const postListItem = asyncHandler(async (req, res) => {
-    const { name, quantity } = req.body
-    let shoppingList = await ShoppingList.find({ _id: req.params.id });
-    shoppingList = shoppingList[0];
-    if(!shoppingList) {
+    const { name, quantity, category, description, checked } = req.body;
+
+    if (!req.user) {
+        res.status(400);
+        throw new Error('User Not Found. Possible Bad Token')
+    }
+
+    const shoppingList = await ShoppingList.findById(req.params.id);
+
+    if (!shoppingList) {
         res.status(400);
         throw new Error('Shopping List Not Found')
     }
@@ -47,7 +53,7 @@ const postListItem = asyncHandler(async (req, res) => {
         res.status(401);
         throw new Error('User Not Authorized')
     }
-    if(shoppingList.items.some(item => item.name === name)) {
+    if (shoppingList.items.some(item => item.name === name)) {
         res.status(400);
         throw new Error('A Shopping List Item With The Same Name Already Exists')
     }
@@ -59,6 +65,16 @@ const postListItem = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('A Shopping List Item Quantity Must Be Provided')
     }
+    if (!category || category.startsWith(' ')) {
+        req.body.category = "Other";
+    }
+    if (!description || description.startsWith(' ')) {
+        req.body.description = "";
+    }
+    if (!checked) {
+        req.body.checked = false;
+    } 
+
     shoppingList.items.push(req.body)
     const updatedShoppingList = await ShoppingList
         .findByIdAndUpdate(req.params.id, shoppingList, {new: true});

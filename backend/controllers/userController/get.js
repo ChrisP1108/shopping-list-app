@@ -11,9 +11,9 @@ const getUser = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('User Not Found. Possible Bad Token')
     }
-    const userLogin = await User.findById(req.user._id);
+    const userLogin = await User.findById(req.user.id);
 
-    if(!userLogin) {
+    if (!userLogin) {
         res.status(400);
         throw new Error('User Not Found')
     }
@@ -33,6 +33,7 @@ const getUser = asyncHandler(async (req, res) => {
             throw new Error('User Not Authorized')
         }
     }
+
     userLogin.password = "Protected";
     userLogin.recovery.pin = "Protected";
     userLogin.recovery.answer = "Protected"; 

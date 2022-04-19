@@ -15,7 +15,7 @@ const deleteAllLists = asyncHandler(async (req, res) => {
 
     const activeList = await ActiveList.find({ user: req.user.id });
 
-    if (!shoppingLists) {
+    if (!shoppingLists.length) {
         res.status(400);
         throw new Error('No Shopping Lists Were Not Found')
     }
@@ -39,8 +39,12 @@ const deleteAllLists = asyncHandler(async (req, res) => {
 // Delete Shopping List Or Item By ID
 
 const deleteList = asyncHandler(async (req, res) => {
-    let shoppingList = await ShoppingList.find({ _id: req.params.id });
-    shoppingList = shoppingList[0];
+    if (!req.user) {
+        res.status(400);
+        throw new Error('User Not Found. Possible Bad Token')
+    }
+
+    const shoppingList = await ShoppingList.findById(req.params.id);
 
     if (!shoppingList) {
         res.status(400);
@@ -64,8 +68,8 @@ const deleteList = asyncHandler(async (req, res) => {
     }
 
     await shoppingList.remove();
-    const deletedVerify = await ShoppingList.find({ _id: req.params.id });
-    if (!deletedVerify.length) {
+    const deletedVerify = await ShoppingList.findById(req.params.id);
+    if (!deletedVerify) {
         res.status(200).json({ id: req.params.id });
     } else {
         res.status(500);
@@ -76,8 +80,12 @@ const deleteList = asyncHandler(async (req, res) => {
 // Delete Shopping List Items
 
 const deleteListItems = asyncHandler(async (req, res) => {
-    let shoppingList = await ShoppingList.find({ _id: req.params.id });
-    shoppingList = shoppingList[0];
+    if (!req.user) {
+        res.status(400);
+        throw new Error('User Not Found. Possible Bad Token')
+    }
+
+    const shoppingList = await ShoppingList.findById(req.params.id);
 
     if (!shoppingList) {
         res.status(400);
@@ -103,6 +111,11 @@ const deleteListItems = asyncHandler(async (req, res) => {
 // Delete Shopping List Item By ID
 
 const deleteListItem = asyncHandler(async (req, res) => {
+    if (!req.user) {
+        res.status(400);
+        throw new Error('User Not Found. Possible Bad Token')
+    }
+
     const shoppingListId = req._parsedUrl.pathname.split('/')[1];
     const shoppingList = await ShoppingList.findById(shoppingListId);
 
@@ -127,7 +140,7 @@ const deleteListItem = asyncHandler(async (req, res) => {
 
     const updatedShoppingList = await ShoppingList
         .findByIdAndUpdate(shoppingListId, shoppingList, {new: true});
-    if (!updatedShoppingList.items.filter(item => item._id.toString() === req.params.id).length) {
+    if (!updatedShoppingList.items.some(item => item._id.toString() === req.params.id)) {
         res.status(200).json({});
     } else {
         res.status(500);

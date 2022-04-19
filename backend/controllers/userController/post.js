@@ -186,8 +186,8 @@ const postUserRecoveryInit = asyncHandler(async (req, res) => {
             throw new Error('Invalid User Credentials Provided');
     }
     if (!await bcrypt.compare(pin, user.recovery.pin)) {
-            res.status(401);
-            throw new Error('Invalid User Credentials Provided');
+        res.status(401);
+        throw new Error('Invalid User Credentials Provided');
     }
     const userUpdate = await User
         .findByIdAndUpdate(user._id, user, {new: true});

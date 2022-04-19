@@ -16,8 +16,13 @@ const getLists = asyncHandler(async (req, res) => {
 // Get Shopping List By ID
 
 const getList = asyncHandler(async (req, res) => {
-    let shoppingList = await ShoppingList.find({ _id: req.params.id });
-    shoppingList = shoppingList[0];
+    if (!req.user) {
+        res.status(400);
+        throw new Error('User Not Found. Possible Bad Token')
+    }
+
+    const shoppingList = await ShoppingList.findById(req.params.id);
+
     if (!shoppingList) {
         res.status(400);
         throw new Error('Shopping List Not Found')
@@ -33,8 +38,12 @@ const getList = asyncHandler(async (req, res) => {
 // Get Shopping List Items
 
 const getListItems = asyncHandler(async (req, res) => {
-    let shoppingList = await ShoppingList.find({ _id: req.params.id });
-    shoppingList = shoppingList[0];
+    if (!req.user) {
+        res.status(400);
+        throw new Error('User Not Found. Possible Bad Token')
+    }
+
+    const shoppingList = await ShoppingList.findById(req.params.id);
 
     if (!shoppingList) {
         res.status(400);
@@ -52,9 +61,13 @@ const getListItems = asyncHandler(async (req, res) => {
 // Get Shopping List Item By ID
 
 const getListItem = asyncHandler(async (req, res) => {
+    if (!req.user) {
+        res.status(400);
+        throw new Error('User Not Found. Possible Bad Token')
+    }
+    
     const shoppingListId = req._parsedUrl.pathname.split('/')[1];
-    let shoppingList = await ShoppingList.find({ _id: shoppingListId });
-    shoppingList = shoppingList[0];
+    const shoppingList = await ShoppingList.findById(shoppingListId);
 
     if (!shoppingList) {
         res.status(400);

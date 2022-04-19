@@ -29,6 +29,10 @@ const ShoppingListSchema = mongoose.Schema({
         description: {
             type: String,
             required: [false]
+        },
+        checked: {
+            type: Boolean,
+            required: [true, 'A checked boolean value must be provided']
         }
     }]
 }, {

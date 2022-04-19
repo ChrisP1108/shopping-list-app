@@ -4,7 +4,7 @@ const User = require('../../models/userModel');
 const ActiveList = require('../../models/activeListModel');
 const ShoppingList = require('../../models/shoppingListModel');
 
-// Clear Active Shopping List Item
+// Delete User
 
 const deleteUser = asyncHandler(async (req, res) => {    
     if (!req.user) {
