@@ -38,10 +38,12 @@ const deleteUser = asyncHandler(async (req, res) => {
     const userRemoved = await User.findById(req.params.id);
     const activeListRemoved = await ActiveList.find({ user: req.user.id });
     const shoppingListsRemoved = await ShoppingList.find({ user: req.user.id });
-    if (userRemoved || activeListRemoved.length || shoppingListsRemoved.length) {
+    if (!userRemoved && !activeListRemoved.length && !shoppingListsRemoved.length) {
+        res.status(200).json({ id: req.params.id })
+    } else {
         res.status(500);
         throw new Error('Failed To Remove User')
-    } else res.status(200).json({ id: req.params.id });
+    }
 });
 
 module.exports = { deleteUser }

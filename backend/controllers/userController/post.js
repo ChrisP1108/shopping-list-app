@@ -145,10 +145,6 @@ const postUserLogin = asyncHandler(async (req, res) => {
 const postUserRecoveryInit = asyncHandler(async (req, res) => {
     let { firstName, email, dob, pin } = req.body;
 
-    if (!dob) {
-        res.status(400);
-        throw new Error('A User Date Of Birth Must Be Provided To Recover User Credentials')
-    }
     if (!firstName) {
         res.status(400);
         throw new Error('A User First Name Must Be Provided To Recover User Credentials')
@@ -156,6 +152,10 @@ const postUserRecoveryInit = asyncHandler(async (req, res) => {
     if (!email) {
         res.status(400);
         throw new Error('A User Email Must Be Provided To Recover User Credentials')
+    }
+    if (!dob) {
+        res.status(400);
+        throw new Error('A User Date Of Birth Must Be Provided To Recover User Credentials')
     }
     if (!pin) {
         res.status(400);
@@ -192,11 +192,11 @@ const postUserRecoveryInit = asyncHandler(async (req, res) => {
     const userUpdate = await User
         .findByIdAndUpdate(user._id, user, {new: true});
     if (userUpdate) {
-        userUpdate.password = "Protected";
-        userUpdate.recovery.dob = "Protected";
-        userUpdate.recovery.pin = "Protected";
-        userUpdate.recovery.answer = "Protected";
-        res.status(200).json(userUpdate);
+        res.status(200).json({
+            _id: userUpdate._id,
+            username: userUpdate.username,
+            question: userUpdate.question
+        });
     } else {
         res.status(500);
         throw new Error('An Error Occured When Updating User Credentials')

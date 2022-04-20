@@ -5,11 +5,13 @@ const ShoppingList = require('../../models/shoppingListModel');
 // Add Shopping List
 
 const postList = asyncHandler(async (req, res) => {
-    const { name, items } = req.body;
+    const { name } = req.body;
+    
     if (!req.user) {
         res.status(400);
         throw new Error('User Not Found. Possible Bad Token')
     }
+    
     if (!name) {
         res.status(400);
         throw new Error('A Shopping List Name Must Be Provided')
@@ -22,8 +24,7 @@ const postList = asyncHandler(async (req, res) => {
 
     const shoppingListCreate = await ShoppingList.insertMany({
         user: req.user.id,
-        name: name,
-        items: items
+        name
     });
     if (shoppingListCreate.length) {
         res.status(201).json(shoppingListCreate);
@@ -36,7 +37,7 @@ const postList = asyncHandler(async (req, res) => {
 // Add Shopping List Item
 
 const postListItem = asyncHandler(async (req, res) => {
-    const { name, quantity, category, description, checked } = req.body;
+    let { name, quantity, category, description, checked } = req.body;
 
     if (!req.user) {
         res.status(400);
@@ -66,16 +67,20 @@ const postListItem = asyncHandler(async (req, res) => {
         throw new Error('A Shopping List Item Quantity Must Be Provided')
     }
     if (!category || category.startsWith(' ')) {
-        req.body.category = "Other";
+        category = "Other";
     }
     if (!description || description.startsWith(' ')) {
-        req.body.description = "";
+        description = "";
     }
     if (!checked) {
-        req.body.checked = false;
+        checked = false;
     } 
 
-    shoppingList.items.push(req.body)
+    const newItem = {
+        name, quantity, category, description, checked
+    };
+
+    shoppingList.items.push(newItem)
     const updatedShoppingList = await ShoppingList
         .findByIdAndUpdate(req.params.id, shoppingList, {new: true});
     

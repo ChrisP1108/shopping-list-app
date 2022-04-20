@@ -32,14 +32,6 @@ const putUserUpdate = asyncHandler(async (req, res) => {
             res.status(400);
             throw new Error('Password Cannot Have Spaces Or Be Less Than 8 Or Greater Than 15 Characters')
     }
-    if (!email) {
-        res.status(400);
-        throw new Error('A User Email Must Be Provided')
-    }
-    if (email.includes(' ') || !email.includes('@') || email.length < 8) {
-            res.status(400);
-            throw new Error('Email Cannot Have Spaces Or Be Less Than 8 And Must Have @')
-    }
     if (!dob) {
         res.status(400);
         throw new Error('A User Date Of Birth Must Be Provided To Register User')
@@ -51,6 +43,14 @@ const putUserUpdate = asyncHandler(async (req, res) => {
     if (firstName.includes(' ')) {
         res.status(400);
         throw new Error('A User First Name Cannot Have Spaces')
+    }
+    if (!email) {
+        res.status(400);
+        throw new Error('A User Email Must Be Provided')
+    }
+    if (email.includes(' ') || !email.includes('@') || email.length < 8) {
+            res.status(400);
+            throw new Error('Email Cannot Have Spaces Or Be Less Than 8 And Must Have @')
     }
     if (!pin) {
         res.status(400);
@@ -117,7 +117,7 @@ const putUserUpdate = asyncHandler(async (req, res) => {
     
     if (userUpdate) {
         res.status(200).json({
-            _id: userUpdate.id,
+            _id: userUpdate._id,
             username: userUpdate.username,
             firstName: userUpdate.firstName,
             email: userUpdate.email,
@@ -134,31 +134,6 @@ const putUserUpdate = asyncHandler(async (req, res) => {
 const putUserRecoveryComplete = asyncHandler(async (req, res) => {
     let { password, dob, pin, firstName, email, question, answer } = req.body;
 
-    if (!dob) {
-        res.status(400);
-        throw new Error('A User Date Of Birth Must Be Provided To Recover Login Credentials')
-    }
-    if (!firstName) {
-        res.status(400);
-        throw new Error('A User First Name Must Be Provided To Recover Login Credentials')
-    }
-    if (!email) {
-        res.status(400);
-        throw new Error('A User Email Must Be Provided To Recover User Credentials')
-    }
-    if (!pin) {
-        res.status(400);
-        throw new Error('A User 4 Digit Pin Must Be Provided To Recover Login Credentials')
-    }
-    pin = pin.toString();
-    if (!question) {
-        res.status(400);
-        throw new Error('User Question Must Be Provided To Recover Answer')
-    }
-    if (!answer) {
-        res.status(400);
-        throw new Error('User Answer To Security Question Must Be Provided To Recover Login Credentials')
-    }
     if (!password) {
         res.status(400);
         throw new Error('A Password Must Be Provided To Update User Login Credentials')
@@ -167,6 +142,31 @@ const putUserRecoveryComplete = asyncHandler(async (req, res) => {
         || password.length > 15 || password.length < 8) {
             res.status(400);
             throw new Error('Password Cannot Have Spaces Or Be Less Than 8 Or Greater Than 15 Characters')
+    }
+    if (!dob) {
+        res.status(400);
+        throw new Error('A User Date Of Birth Must Be Provided To Recover Login Credentials')
+    }
+    if (!pin) {
+        res.status(400);
+        throw new Error('A User 4 Digit Pin Must Be Provided To Recover Login Credentials')
+    }
+    pin = pin.toString();
+    if (!firstName) {
+        res.status(400);
+        throw new Error('A User First Name Must Be Provided To Recover Login Credentials')
+    }
+    if (!email) {
+        res.status(400);
+        throw new Error('A User Email Must Be Provided To Recover User Credentials')
+    }
+    if (!question) {
+        res.status(400);
+        throw new Error('User Question Must Be Provided To Recover Answer')
+    }
+    if (!answer) {
+        res.status(400);
+        throw new Error('User Answer To Security Question Must Be Provided To Recover Login Credentials')
     }
 
     const user = await User.findById(req.params.id);
@@ -215,7 +215,7 @@ const putUserRecoveryComplete = asyncHandler(async (req, res) => {
     
     if (userUpdate) {
         res.status(200).json({
-            _id: userUpdate.id,
+            _id: userUpdate._id,
             username: user.username,
             firstName: user.firstName,
             email: user.email,

@@ -13,6 +13,13 @@ const getUser = asyncHandler(async (req, res) => {
     }
     const userLogin = await User.findById(req.user.id);
 
+    userLogin.user = userLogin._id;
+
+    if (!userVerify(req.user, userLogin)) {
+        res.status(401);
+        throw new Error('User Not Authorized')
+    }
+
     if (!userLogin) {
         res.status(400);
         throw new Error('User Not Found')
@@ -34,13 +41,13 @@ const getUser = asyncHandler(async (req, res) => {
         }
     }
 
-    userLogin.password = "Protected";
-    userLogin.recovery.pin = "Protected";
-    userLogin.recovery.answer = "Protected"; 
-
-
     res.status(200).json({ 
-        user: userLogin,
+        user: {
+            _id: userLogin._id,
+            username: userLogin.username,
+            firstName: userLogin.firstName,
+            email: userLogin.email
+        },
         activeShoppingList: activeList[0],
         savedShoppingLists: [...shoppingList]
     });

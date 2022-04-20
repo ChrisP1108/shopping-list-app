@@ -101,7 +101,7 @@ const deleteListItems = asyncHandler(async (req, res) => {
     const updatedShoppingList = await ShoppingList
         .findByIdAndUpdate(req.params.id, shoppingList, {new: true});
     if (!updatedShoppingList.items.length) {
-        res.status(200).json(updatedShoppingList);
+        res.status(200).json({ id: req.params.id });
     } else {
         res.status(500);
         throw new Error('An Error Occured When Deleting Shopping List Items');
@@ -141,7 +141,7 @@ const deleteListItem = asyncHandler(async (req, res) => {
     const updatedShoppingList = await ShoppingList
         .findByIdAndUpdate(shoppingListId, shoppingList, {new: true});
     if (!updatedShoppingList.items.some(item => item._id.toString() === req.params.id)) {
-        res.status(200).json({});
+        res.status(200).json({ id: req.params.id });
     } else {
         res.status(500);
         throw new Error('An Error Occured When Deleting Shopping List Items');

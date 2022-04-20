@@ -5,8 +5,14 @@ const ActiveList = require('../../models/activeListModel');
 // Clear Active Shopping List Item
 
 const deleteActiveList = asyncHandler(async (req, res) => {
+    if (!req.user) {
+        res.status(400);
+        throw new Error('User Not Found. Possible Bad Token')
+    }
+    
     const activeList = await ActiveList.findById(req.params.id);
-    if (!ActiveList) {
+    
+    if (!activeList) {
         res.status(400);
         throw new Error('Active Shopping List Already Empty')
     }
