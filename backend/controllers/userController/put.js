@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs/dist/bcrypt');
 // Update User Credentials
 
 const putUserUpdate = asyncHandler(async (req, res) => {
-    const { username, password, dob, firstName, email, pin, question, answer } = req.body;
+    let { username, password, dob, firstName, email, pin, question, answer } = req.body;
     
     if (!req.user) {
         res.status(400);
@@ -121,7 +121,7 @@ const putUserUpdate = asyncHandler(async (req, res) => {
             username: userUpdate.username,
             firstName: userUpdate.firstName,
             email: userUpdate.email,
-            token: generateToken(userCreate._id)
+            token: generateToken(userUpdate._id)
         });
     } else {
         res.status(500);

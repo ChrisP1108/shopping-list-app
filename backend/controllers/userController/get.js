@@ -9,7 +9,7 @@ const { userVerify } = require('../../middleware/userMiddleware');
 const getUser = asyncHandler(async (req, res) => {
     if (!req.user) {
         res.status(400);
-        throw new Error('User Not Found. Possible Bad Token')
+        throw new Error('User Not Found. User May Have Been Deleted Or Possible Bad Token')
     }
     const userLogin = await User.findById(req.user.id);
 

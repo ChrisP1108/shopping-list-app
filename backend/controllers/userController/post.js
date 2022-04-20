@@ -112,12 +112,13 @@ const postUserRegister = asyncHandler(async (req, res) => {
 // User Login
 
 const postUserLogin = asyncHandler(async (req, res) => {
-    const { username, password } = req.body;
+    let { username, password } = req.body;
 
     if (!username) {
         res.status(400);
         throw new Error('A Username Must Be Provided To Login')
     }
+    username = username.toLowerCase();
     if (!password) {
         res.status(400);
         throw new Error('A Password Must Be Provided To Login')
@@ -129,7 +130,7 @@ const postUserLogin = asyncHandler(async (req, res) => {
         throw new Error('User Not Found')
     }
 
-    if (!await bcrypt.compare(password, user.password)) {
+    if (!await bcrypt.compare(password.toLowerCase(), user.password)) {
         res.status(400);
         throw new Error('Invalid Password')
     }
@@ -170,7 +171,7 @@ const postUserRecoveryInit = asyncHandler(async (req, res) => {
             dob: dob
             }
         },
-        { email: email}
+        { email: email.toLowerCase()}
     );
 
     if (!userSearch || !userSearch.length) {
@@ -195,7 +196,7 @@ const postUserRecoveryInit = asyncHandler(async (req, res) => {
         res.status(200).json({
             _id: userUpdate._id,
             username: userUpdate.username,
-            question: userUpdate.question
+            question: userUpdate.recovery.question
         });
     } else {
         res.status(500);
