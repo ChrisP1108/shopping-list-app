@@ -13,7 +13,7 @@ const postUserRegister = asyncHandler(async (req, res) => {
         throw new Error('A Username Must Be Provided To Register User')
     }
     if(username.includes(' ') 
-        || username.length > 15 || username.length < 8) {
+        || username.length > 15 || username.length < 8 || typeof username !== 'string') {
             res.status(400);
             throw new Error('Username Cannot Have Spaces Or Be Less Than 8 Or Greater Than 15 Characters')
     }
@@ -22,7 +22,7 @@ const postUserRegister = asyncHandler(async (req, res) => {
         throw new Error('A Password Must Be Provided To Register User')
     }
     if (password.includes(' ') 
-        || password.length > 15 || password.length < 8) {
+        || password.length > 15 || password.length < 8 || typeof password !== 'string') {
             res.status(400);
             throw new Error('Password Cannot Have Spaces Or Be Less Than 8 Or Greater Than 15 Characters')
     }
@@ -30,15 +30,15 @@ const postUserRegister = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('A User Email Must Be Provided')
     }
-    if (email.includes(' ') || !email.includes('@') || email.length < 8) {
+    if (email.includes(' ') || !email.includes('@') || email.length < 8 || typeof email !== 'string') {
             res.status(400);
             throw new Error('Email Cannot Have Spaces Or Be Less Than 8 And Must Have @')
     }
-    if (!dob) {
+    if (!dob || typeof dob !== 'string') {
         res.status(400);
         throw new Error('A User Date Of Birth Must Be Provided To Register User')
     }
-    if (!firstName) {
+    if (!firstName || typeof firstName !== 'string') {
         res.status(400);
         throw new Error('A User First Name Must Be Provided To Register User')
     }
@@ -46,7 +46,7 @@ const postUserRegister = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('A User First Name Cannot Have Spaces')
     }
-    if (!pin) {
+    if (!pin || typeof pin !== 'number') {
         res.status(400);
         throw new Error('A User 4 Digit Pin Must Be Provided To Register User')
     }
@@ -59,7 +59,7 @@ const postUserRegister = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('A Unique User Recover Security Question Must Be Provided')
     }
-    if (question.length > 50 || question.length < 8) {
+    if (question.length > 50 || question.length < 8 || typeof question !== 'string') {
         res.status(400);
         throw new Error('User Recovery Question Cannot Be Less Than 8 Or Greater Than 50 Characters')
     }
@@ -67,7 +67,7 @@ const postUserRegister = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('A Unique User Recover Security Answer Must Be Provided')
     }
-    if (answer.includes(' ') || answer.length > 15 || answer.length < 8) {
+    if (answer.includes(' ') || answer.length > 15 || answer.length < 8 || typeof answer !== 'string') {
         res.status(400);
         throw new Error('User Recovery Answer Cannot Have Spaces Or Be Less Than 8 Or Greater Than 15 Characters')
     }
@@ -114,12 +114,12 @@ const postUserRegister = asyncHandler(async (req, res) => {
 const postUserLogin = asyncHandler(async (req, res) => {
     let { username, password } = req.body;
 
-    if (!username) {
+    if (!username || typeof username !== 'string') {
         res.status(400);
         throw new Error('A Username Must Be Provided To Login')
     }
     username = username.toLowerCase();
-    if (!password) {
+    if (!password || typeof password !== 'string') {
         res.status(400);
         throw new Error('A Password Must Be Provided To Login')
     }
@@ -146,19 +146,19 @@ const postUserLogin = asyncHandler(async (req, res) => {
 const postUserRecoveryInit = asyncHandler(async (req, res) => {
     let { firstName, email, dob, pin } = req.body;
 
-    if (!firstName) {
+    if (!firstName || typeof firstName !== 'string') {
         res.status(400);
         throw new Error('A User First Name Must Be Provided To Recover User Credentials')
     }
-    if (!email) {
+    if (!email || typeof email !== 'string') {
         res.status(400);
         throw new Error('A User Email Must Be Provided To Recover User Credentials')
     }
-    if (!dob) {
+    if (!dob || typeof dob !== 'string') {
         res.status(400);
         throw new Error('A User Date Of Birth Must Be Provided To Recover User Credentials')
     }
-    if (!pin) {
+    if (!pin || typeof pin !== 'number') {
         res.status(400);
         throw new Error('A User 4 Digit Pin Must Be Provided')
     }

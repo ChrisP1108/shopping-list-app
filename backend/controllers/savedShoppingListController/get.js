@@ -10,8 +10,9 @@ const getLists = asyncHandler(async (req, res) => {
         throw new Error('User Not Found. Possible Bad Token')
     }
     const shoppingList = await ShoppingList.find({ user: req.user.id });
+
     if (shoppingList.length) {
-        if (!userVerify(req.user, shoppingList)) {
+        if (!userVerify(req.user, shoppingList[0])) {
             res.status(401);
             throw new Error('User Not Authorized')
         }

@@ -3,9 +3,21 @@ const { userVerify } = require('../../middleware/userMiddleware');
 const ShoppingList = require('../../models/shoppingListModel');
 const ActiveList = require('../../models/activeListModel');
 
-// Delete All Shopping Lists
+// Delete Shopping Lists
 
-const deleteAllLists = asyncHandler(async (req, res) => {
+const deleteLists = asyncHandler(async (req, res) => {
+    if (typeof req.body !== 'object' || !req.body.length) {
+        res.status(400);
+        throw new Error('Insufficient Request Data.  Lists To Delete Must Be In A String Array')
+    }
+
+    req.body.forEach(id => {
+        if (typeof id !== 'string') {
+            res.status(400);
+            throw new Error("List ID's To Delete Must Be In A String Array")
+        }
+    })
+    
     if (!req.user) {
         res.status(400);
         throw new Error('User Not Found. Possible Bad Token')
@@ -17,26 +29,55 @@ const deleteAllLists = asyncHandler(async (req, res) => {
 
     if (!shoppingLists.length) {
         res.status(400);
-        throw new Error('No Shopping Lists Were Not Found')
+        throw new Error('No Shopping Lists Were Found')
     }
 
     if (!userVerify(req.user, shoppingLists[0])) {
         res.status(401);
         throw new Error('User Not Authorized')
     }
-    shoppingLists.forEach(async (item) => await item.remove());
-    activeList[0].remove();
+
+    let activeFound = false;
+
+    let anythingFound = false;
+
+    req.body.forEach(async (item) => {
+        const index = shoppingLists.findIndex(i => i._id.toString() === item);
+        if (index !== -1) {
+            anythingFound = true;
+            await shoppingLists[index].remove();
+            if (activeList.length) {
+                if (activeList[0].activeShoppingList.toString() === item.toString()) {
+                    await activeList[0].remove();
+                    activeFound = true;
+                }
+            }
+        }
+    });
+
+    if (!anythingFound) {
+        res.status(400);
+        throw new Error("Shopping Lists Not Found Based Upon ID's Provided")
+    }
+
     const deletedSavedVerify = await ShoppingList.find({ user: req.user.id });
-    const deletedActiveVerify = await ActiveList.find({ user: req.user.id });
-    if (!deletedSavedVerify.length && !deletedActiveVerify.length) {
-        res.status(200).json([]);
+    
+    const savedDeleted = deletedSavedVerify.every(item => !req.body.includes(item))
+    
+    let deletedActiveVerify = [];
+    
+    if (activeFound) {
+        deletedActiveVerify = await ActiveList.find({ user: req.user.id });
+    }
+    if (!deletedActiveVerify.length && savedDeleted) {
+        res.status(200).json(deletedSavedVerify);
     } else {
         res.status(500);
         throw new Error('An Error Occured When Deleting All Saved Shopping Lists');
     }
 });
 
-// Delete Shopping List Or Item By ID
+// Delete Shopping List By ID
 
 const deleteList = asyncHandler(async (req, res) => {
     if (!req.user) {
@@ -80,12 +121,25 @@ const deleteList = asyncHandler(async (req, res) => {
 // Delete Shopping List Items
 
 const deleteListItems = asyncHandler(async (req, res) => {
+    if (typeof req.body !== 'object' || !req.body.length) {
+        res.status(400);
+        throw new Error('Insufficient Request Data.  Items To Delete Must Be In A String Array')
+    }
+
+    req.body.forEach(id => {
+        if (typeof id !== 'string') {
+            res.status(400);
+            throw new Error("Item ID's To Delete Must Be In A String Array")
+        }
+    })
+
     if (!req.user) {
         res.status(400);
         throw new Error('User Not Found. Possible Bad Token')
     }
 
-    const shoppingList = await ShoppingList.findById(req.params.id);
+    const shoppingListId = req._parsedUrl.pathname.split('/')[1];
+    const shoppingList = await ShoppingList.findById(shoppingListId);
 
     if (!shoppingList) {
         res.status(400);
@@ -97,11 +151,16 @@ const deleteListItems = asyncHandler(async (req, res) => {
         throw new Error('User Not Authorized')
     }
 
-    shoppingList.items = [];
+    req.body.forEach(async (item) => {
+        const index = shoppingList.items.findIndex(i => i._id.toString() === item);
+        if (index !== -1) {
+            shoppingList.items.splice(index, 1);
+        }
+    });
     const updatedShoppingList = await ShoppingList
-        .findByIdAndUpdate(req.params.id, shoppingList, {new: true});
-    if (!updatedShoppingList.items.length) {
-        res.status(200).json({ id: req.params.id });
+        .findByIdAndUpdate(shoppingListId, shoppingList, {new: true});
+    if (updatedShoppingList.items.every(item => !shoppingList.items.some(i => i._id === item.id))) {
+        res.status(200).json(updatedShoppingList);
     } else {
         res.status(500);
         throw new Error('An Error Occured When Deleting Shopping List Items');
@@ -117,6 +176,7 @@ const deleteListItem = asyncHandler(async (req, res) => {
     }
 
     const shoppingListId = req._parsedUrl.pathname.split('/')[1];
+    
     const shoppingList = await ShoppingList.findById(shoppingListId);
 
     if (!shoppingList) {
@@ -149,7 +209,7 @@ const deleteListItem = asyncHandler(async (req, res) => {
 });
 
 module.exports = { 
-    deleteAllLists,
+    deleteLists,
     deleteList, 
     deleteListItems, 
     deleteListItem 

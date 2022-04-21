@@ -16,6 +16,10 @@ const postList = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('A Shopping List Name Must Be Provided')
     }
+    if (name && typeof name !== 'string') {
+        res.status(400);
+        throw new Error('A Shopping List Name Must Be A String Variable')
+    }
     const shoppingList = await ShoppingList.find({ user: req.user.id });
     if (shoppingList.some(list => list.name === name)) {
         res.status(400);
@@ -34,65 +38,96 @@ const postList = asyncHandler(async (req, res) => {
     }  
 });
 
-// Add Shopping List Item
+// Add Shopping List Items
 
-const postListItem = asyncHandler(async (req, res) => {
-    let { name, quantity, category, description, checked } = req.body;
+const postListItems = asyncHandler(async (req, res) => {
+    if (typeof req.body !== 'object' || !req.body.length) {
+        res.status(400);
+        throw new Error('Insufficient Request Data')
+    }
 
     if (!req.user) {
         res.status(400);
         throw new Error('User Not Found. Possible Bad Token')
     }
 
-    const shoppingList = await ShoppingList.findById(req.params.id);
+    const shoppingListId = req._parsedUrl.pathname.split('/')[1];
+
+    const shoppingList = await ShoppingList.findById(shoppingListId);
 
     if (!shoppingList) {
         res.status(400);
         throw new Error('Shopping List Not Found')
     }
+
+    req.body.forEach(item => {
+        const { name, quantity, category, description, checked } = item;
+        if (shoppingList.items.some(item => item.name === name)) {
+            res.status(400);
+            throw new Error('A Shopping List Item With The Same Name Already Exists')
+        }
+        if (!name) {
+            res.status(400);
+            throw new Error('A Shopping List Item Names Must Be Provided')
+        }
+        if (name && typeof name !== 'string') {
+            res.status(400);
+            throw new Error('A Shopping List Name Must Be A String Variable')
+        }
+        if (!quantity) {
+            res.status(400);
+            throw new Error('A Shopping List Item Quantity Must Be Provided')
+        }
+        if (quantity && typeof quantity !== 'number') {
+            res.status(400);
+            throw new Error('A Shopping List Item Quantity Must Be A Number Variable')
+        }
+        if (category && typeof category !== 'string') {
+            res.status(400);
+            throw new Error('A Shopping List Item Category Must Be A String Variable')
+        }
+        if (description && typeof description !== 'string') {
+            res.status(400);
+            throw new Error('A Shopping List Item Description Must Be A String Variable')
+        }
+        if (checked && typeof checked !== 'boolean') {
+            res.status(400);
+            throw new Error('A Shopping List Item Checked Value Must Be A Boolean')
+        }
+    });
+    
     if (!userVerify(req.user, shoppingList)) {
         res.status(401);
         throw new Error('User Not Authorized')
     }
-    if (shoppingList.items.some(item => item.name === name)) {
-        res.status(400);
-        throw new Error('A Shopping List Item With The Same Name Already Exists')
-    }
-    if (!name) {
-        res.status(400);
-        throw new Error('A Shopping List Item Name Must Be Provided')
-    }
-    if (!quantity) {
-        res.status(400);
-        throw new Error('A Shopping List Item Quantity Must Be Provided')
-    }
-    if (!category || category.startsWith(' ')) {
-        category = "Other";
-    }
-    if (!description || description.startsWith(' ')) {
-        description = "";
-    }
-    if (!checked) {
-        checked = false;
-    } 
 
-    const newItem = {
-        name, quantity, category, description, checked
-    };
+    const newItems = req.body.map(item => {
+        let { name, quantity, category, description, checked } = item;
+        if (!category || category.startsWith(' ')) {
+            category = "Other";
+        }
+        if (!description || description.startsWith(' ')) {
+            description = "";
+        }
+        if (!checked) {
+            checked = false;
+        }
+        return { name, quantity, category, description, checked } 
+    });
 
-    shoppingList.items.push(newItem)
+    shoppingList.items = [...shoppingList.items, ...newItems];
     const updatedShoppingList = await ShoppingList
-        .findByIdAndUpdate(req.params.id, shoppingList, {new: true});
+        .findByIdAndUpdate(shoppingListId, shoppingList, {new: true});
     
-    if (updatedShoppingList.items.some(item => item.name === name)) {
+    if (newItems.every(item => updatedShoppingList.items.some(i => i.name === item.name))) {
         res.status(201).json(updatedShoppingList.items);
     } else {
         res.status(500);
-        throw new Error('An Error Occured When Adding Shopping List Item')
+        throw new Error('An Error Occured When Adding Shopping List Items')
     }  
 });
 
 module.exports = {
     postList, 
-    postListItem 
+    postListItems 
 }

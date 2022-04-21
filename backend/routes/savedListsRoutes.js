@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 
 const { getLists, getList, getListItems, getListItem } = require('../controllers/savedShoppingListController/get');
-const { postList, postListItem  } = require('../controllers/savedShoppingListController/post');
-const { putList, putListItem , putResetItemsChecked } = require('../controllers/savedShoppingListController/put');
-const { deleteAllLists, deleteList, deleteListItems, deleteListItem } = require('../controllers/savedShoppingListController/delete');
+const { postList, postListItems  } = require('../controllers/savedShoppingListController/post');
+const { putList, putListItems, putListItem } = require('../controllers/savedShoppingListController/put');
+const { deleteLists, deleteList, deleteListItems, deleteListItem } = require('../controllers/savedShoppingListController/delete');
 
 const { protect } = require('../middleware/authMiddleware');
 
@@ -18,15 +18,15 @@ router.get('/:id/items/:id', protect, getListItem); // Get Shopping List Item By
 
 router.post('/', protect, postList); // Add Shopping List
 
-router.post('/:id/items', protect, postListItem); // Add Shopping List Item
+router.post('/:id/items', protect, postListItems); // Add Shopping List Items
 
 router.put('/:id', protect, putList); // Update Shopping List Name By ID
 
-router.put('/:id/items', protect, putResetItemsChecked); // Reset Shopping List Items Checked Values To False
+router.put('/:id/items', protect, putListItems); // Update Shopping List Items
 
 router.put('/:id/items/:id', protect, putListItem); // Update Shopping List Item By ID
 
-router.delete('/', protect, deleteAllLists); // Delete All Shopping Lists
+router.delete('/', protect, deleteLists); // Delete Shopping Lists
 
 router.delete('/:id', protect, deleteList); // Delete Shopping List Or Item By ID
 

@@ -27,6 +27,10 @@ const putList = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('Shopping List Name Must Be Defined')
     }
+    if (name && typeof name !== 'string') {
+        res.status(400);
+        throw new Error('A Shopping List Name Must Be A String Variable')
+    }
     if (shoppingList.name === name) {
         res.status(400);
         throw new Error('Shopping List Already Has The Same Name')
@@ -47,15 +51,51 @@ const putList = asyncHandler(async (req, res) => {
     }  
 });
 
-// Reset Shopping List Items Checked Values To False
+// Update Shopping List Items
 
-const putResetItemsChecked = asyncHandler(async (req, res) => {
+const putListItems = asyncHandler(async (req, res) => {
+    if (typeof req.body !== 'object' || !req.body.length) {
+        res.status(400);
+        throw new Error('Insufficient Request Data.  Items To Update Must Be In An Array')
+    }
+
+    req.body.forEach(item => {
+        const { _id, name, quantity, category, description, checked } = item;
+
+        if (!_id) {
+            res.status(400);
+            throw new Error("Shopping List Items Must Have Their ID's Provided")
+        }
+        if (name && typeof name !== 'string') {
+            res.status(400);
+            throw new Error('A Shopping List Item Name Must Be A String Variable')
+        }
+        if (quantity && typeof quantity !== 'number') {
+            res.status(400);
+            throw new Error('A Shopping List Item Quantity Must Be A Number Variable')
+        }
+        if (category && typeof category !== 'string') {
+            res.status(400);
+            throw new Error('A Shopping List Item Category Must Be A String Variable')
+        }
+        if (description && typeof description !== 'string') {
+            res.status(400);
+            throw new Error('A Shopping List Item Description Must Be A String Variable')
+        }
+        if (checked && typeof checked !== 'boolean') {
+            res.status(400);
+            throw new Error('A Shopping List Item Checked Value Must Be A Boolean')
+        }
+    });
+
     if (!req.user) {
         res.status(400);
         throw new Error('User Not Found. Possible Bad Token')
     }
-    
-    const shoppingList = await ShoppingList.findById(req.params.id);
+
+    const shoppingListId = req._parsedUrl.pathname.split('/')[1];
+    console.log(shoppingListId)
+    const shoppingList = await ShoppingList.findById(shoppingListId);
 
     if (!shoppingList) {
         res.status(400);
@@ -66,12 +106,48 @@ const putResetItemsChecked = asyncHandler(async (req, res) => {
         res.status(401);
         throw new Error('User Not Authorized')
     }
-    if (shoppingList.items.length) {
-        shoppingList.items = shoppingList.items.map(item => ({ ...item, checked: false }));
+    if (!shoppingList.items.length) {
+        res.status(400);
+        throw new Error('There Are No Items In The Shopping List To Update')
     }
+
+    let inputNames = [];
+
+    req.body.forEach(item => {
+        const { _id, name, quantity, category, description, checked } = item;
+        const index = shoppingList.items.findIndex(i => i._id.toString() === _id.toString());
+        if (index !== -1) {
+            if (name) {
+                shoppingList.items[index].name = name;
+                inputNames.push(name);
+            }
+            if (quantity) {
+                shoppingList.items[index].quantity = quantity;
+            }
+            if (category) {
+                shoppingList.items[index].category = category;
+            }
+            if (description) {
+                shoppingList.items[index].description = description;
+            }
+            if (checked === true) {
+                shoppingList.items[index].checked = true;
+            } else shoppingList.items[index].checked = false;
+        }
+    });
+
+    if (inputNames.length > 0) {
+        inputNames.forEach(name => {
+            if (shoppingList.items.filter(item => item.name === name).length > 1) {
+                res.status(400);
+                throw new Error('There Will Be Two Items With The Same Name')
+            }
+        });
+    }
+    
     const updatedShoppingList = await ShoppingList
-        .findByIdAndUpdate(req.params.id, shoppingList, {new: true});
-    if (updatedShoppingList) {
+        .findByIdAndUpdate(shoppingListId, shoppingList, {new: true});
+    if (updatedShoppingList.items.every(item => shoppingList.items.some(i => i.name === item.name))) {
         res.status(200).json(updatedShoppingList.items);
     } else {
         res.status(500);
@@ -105,15 +181,35 @@ const putListItem = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('A Shopping List Item Name Must Be Provided')
     }
+    if (name && typeof name !== 'string') {
+        res.status(400);
+        throw new Error('A Shopping List Item Names Must Be A String Variable')
+    }
     if (!quantity) {
         res.status(400);
         throw new Error('A Shopping List Item Quantity Must Be Provided')
     }
+    if (quantity && typeof quantity !== 'number') {
+        res.status(400);
+        throw new Error('A Shopping List Item Quantity Must Be A Number Variable')
+    }
+    if (category && typeof category !== 'string') {
+        res.status(400);
+        throw new Error('A Shopping List Item Category Must Be A String Variable')
+    }
     if (!category || category.startsWith(' ')) {
         category = "Other";
     }
+    if (description && typeof description !== 'string') {
+        res.status(400);
+        throw new Error('A Shopping List Item Description Must Be A String Variable')
+    }
     if (!description || description.startsWith(' ')) {
         description = "";
+    }
+    if (checked && typeof checked !== 'boolean') {
+        res.status(400);
+        throw new Error('A Shopping List Item Checked Value Must Be A Boolean')
     }
     if (!checked) {
         checked = false;
@@ -151,6 +247,6 @@ const putListItem = asyncHandler(async (req, res) => {
 
 module.exports = { 
     putList, 
-    putResetItemsChecked,
+    putListItems,
     putListItem 
 }
