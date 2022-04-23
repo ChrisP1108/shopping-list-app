@@ -46,7 +46,12 @@ const getUser = asyncHandler(async (req, res) => {
             _id: userLogin._id,
             username: userLogin.username,
             firstName: userLogin.firstName,
-            email: userLogin.email
+            email: userLogin.email,
+            settings: {
+                themeColor: userLogin.settings.themeColor,
+                sortBy: userLogin.settings.sortBy,
+                showChecked: userLogin.settings.showChecked
+            }
         },
         activeShoppingList: activeList[0],
         savedShoppingLists: [...shoppingList]

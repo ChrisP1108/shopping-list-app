@@ -21,6 +21,23 @@ const userSchema = mongoose.Schema({
         required: [true, 'A User Email Must Be Provided'],
         unique: true
     },
+    settings: {
+        themeColor: {
+            type: String,
+            required: [false],
+            unique: false
+        },
+        sortBy: {
+            type: String,
+            required: [false],
+            unique: false
+        },
+        showChecked: {
+            type: Boolean,
+            required: [false],
+            unique: false
+        }
+    },
     recovery: {
         dob: {
             type: String,

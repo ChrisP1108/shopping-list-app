@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs/dist/bcrypt');
 // Update User Credentials
 
 const putUserUpdate = asyncHandler(async (req, res) => {
-    let { username, password, dob, firstName, email, pin, question, answer } = req.body;
+    let { username, password, dob, firstName, email, pin, question, answer, settings } = req.body;
     
     if (!req.user) {
         res.status(400);
@@ -78,7 +78,14 @@ const putUserUpdate = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('User Recovery Answer Cannot Have Spaces Or Be Less Than 8 Or Greater Than 15 Characters')
     }
-    
+    if(!settings) {
+        settings = {
+            themeColor: "default",
+            sortBy: "name",
+            showChecked: false
+        }
+    }
+
     const user = await User.findById(req.params.id);
     
     if (!user) {
@@ -104,6 +111,11 @@ const putUserUpdate = asyncHandler(async (req, res) => {
         password: hashedPassword,
         firstName: firstName[0].toUpperCase() + firstName.slice(1).toLowerCase(),
         email: email.toLowerCase(),
+        settings: {
+            themeColor: settings.themeColor.toLowerCase(),
+            sortBy: settings.sortBy.toLowerCase(),
+            showChecked: settings.showChecked
+        },
         recovery: {
             dob: dob.toString().toLowerCase(),
             pin: hashedPin,
@@ -121,6 +133,11 @@ const putUserUpdate = asyncHandler(async (req, res) => {
             username: userUpdate.username,
             firstName: userUpdate.firstName,
             email: userUpdate.email,
+            settings: {
+                themeColor: userUpdate.settings.themeColor,
+                sortBy: userUpdate.settings.sortBy,
+                showChecked: settings.showChecked
+            },
             token: generateToken(userUpdate._id)
         });
     } else {
@@ -128,6 +145,73 @@ const putUserUpdate = asyncHandler(async (req, res) => {
         throw new Error('An Error Occured When Updating User Credentials')
     }
 });
+
+// Update User Settings
+
+const putUserUpdateSettings = asyncHandler(async (req, res) => { 
+    let { themeColor, sortBy, showChecked } = req.body
+    if (!req.body || typeof req.body !== 'object') {
+        res.status(400);
+        throw new Error('Request Data Must Be An Object')
+    }
+    
+    if (!req.user) {
+        res.status(400);
+        throw new Error('User Not Found. Possible Bad Token')
+    }
+
+    const userLogin = await User.findById(req.user.id);
+
+    userLogin.user = userLogin._id;
+
+    if (!userVerify(req.user, userLogin)) {
+        res.status(401);
+        throw new Error('User Not Authorized')
+    }
+
+    if (!themeColor) {
+        themeColor = "default";
+    }
+    if (!sortBy) {
+        sortBy = 'name';
+    }
+    if (!showChecked) {
+        showChecked = false;
+    }
+
+    const updateUser = {
+        username: userLogin.username,
+        password: userLogin.password,
+        firstName: userLogin.firstName,
+        email: userLogin.email,
+        settings: { themeColor, sortBy,showChecked },
+        recovery: {
+            dob: userLogin.recovery.dob,
+            pin: userLogin.recovery.pin,
+            question: userLogin.recovery.question,
+            answer: userLogin.recovery.answer
+        }
+    }
+
+    const updateUserSettings = await User
+        .findByIdAndUpdate(req.user.id, updateUser, {new: true});
+    
+    if (updateUserSettings.settings.themeColor === themeColor &&
+        updateUserSettings.settings.sortBy === sortBy &&
+        updateUserSettings.settings.showChecked === showChecked) {
+            res.status(200).json({ 
+                user: updateUserSettings.id,
+                settings: {
+                    themeColor: updateUserSettings.settings.themeColor,
+                    sortBy: updateUserSettings.settings.sortBy, 
+                    showChecked: updateUserSettings.settings.showChecked
+                }
+            });
+    } else {
+        res.status(500);
+        throw new Error('An Error Occured When Updating User Theme Color')
+    }
+})
 
 // Finish Recovery Of Login Credentials From Provided User ID And Question
 
@@ -202,6 +286,11 @@ const putUserRecoveryComplete = asyncHandler(async (req, res) => {
         password: hashedPassword,
         firstName: user.firstName,
         email: user.email,
+        settings: {
+            themeColor: user.settings.themeColor,
+            sortBy: user.settings.sortBy,
+            showChecked: user.settings.showChecked
+        },
         recovery: {
             dob: user.recovery.dob,
             pin: user.recovery.pin,
@@ -216,9 +305,14 @@ const putUserRecoveryComplete = asyncHandler(async (req, res) => {
     if (userUpdate) {
         res.status(200).json({
             _id: userUpdate._id,
-            username: user.username,
-            firstName: user.firstName,
-            email: user.email,
+            username: userUpdate.username,
+            firstName: userUpdate.firstName,
+            email: userUpdate.email,
+            settings: {
+                themeColor: userUpdate.settings.themeColor,
+                sortBy: userUpdate.settings.sortBy,
+                showChecked: userUpdate.settings.showChecked
+            },
             token: generateToken(userUpdate.id)
         });
     } else {
@@ -227,4 +321,7 @@ const putUserRecoveryComplete = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { putUserUpdate, putUserRecoveryComplete }
+module.exports = { putUserUpdate, 
+    putUserUpdateSettings, 
+    putUserRecoveryComplete 
+}

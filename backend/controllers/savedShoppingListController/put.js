@@ -27,10 +27,10 @@ const putList = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('Shopping List Name Must Be Defined')
     }
-    if (name && typeof name !== 'string') {
+    if (name.length > 15 || name.length < 8 || typeof name !== 'string') {
         res.status(400);
-        throw new Error('A Shopping List Name Must Be A String Variable')
-    }
+        throw new Error('List Name Cannot Have Spaces Or Be Less Than 8 Or Greater Than 15 Characters')
+}
     if (shoppingList.name === name) {
         res.status(400);
         throw new Error('Shopping List Already Has The Same Name')

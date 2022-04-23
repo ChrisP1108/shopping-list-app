@@ -71,6 +71,7 @@ const postUserRegister = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('User Recovery Answer Cannot Have Spaces Or Be Less Than 8 Or Greater Than 15 Characters')
     }
+
     const userExists = await User.findOne({username})
     if (userExists) {
         res.status(400);
@@ -78,6 +79,7 @@ const postUserRegister = asyncHandler(async (req, res) => {
     }
 
     const salt = await bcrypt.genSalt(10);
+
     const hashedPassword = await bcrypt.hash(password.toLowerCase(), salt);
     const hashedPin = await bcrypt.hash(pin, salt);
     const hashedAnswer = await bcrypt.hash(answer.toLowerCase(), salt);
@@ -87,6 +89,11 @@ const postUserRegister = asyncHandler(async (req, res) => {
         password: hashedPassword,
         firstName: firstName[0].toUpperCase() + firstName.slice(1).toLowerCase(),
         email: email.toLowerCase(),
+        settings: {
+            themeColor: 'default',
+            sortBy: 'name',
+            showChecked: false
+        },
         recovery: {
             dob: dob.toString().toLowerCase(),
             pin: hashedPin,
@@ -101,6 +108,11 @@ const postUserRegister = asyncHandler(async (req, res) => {
             username: userCreate.username,
             firstName: userCreate.firstName,
             email: userCreate.email,
+            settings: {
+                themeColor: userCreate.settings.themeColor,
+                sortBy: userCreate.settings.sortBy,
+                showChecked: userCreate.settings.showChecked
+            },
             token: generateToken(userCreate._id)
         });
     } else {
@@ -137,6 +149,13 @@ const postUserLogin = asyncHandler(async (req, res) => {
     res.status(200).json({
         _id: user._id,
         username: user.username,
+        firstName: user.firstName,
+        email: user.email,
+        settings: {
+            themeColor: user.settings.themeColor,
+            sortBy: user.settings.sortBy,
+            showChecked: user.settings.showChecked
+        },
         token: generateToken(user._id)
     });
 });

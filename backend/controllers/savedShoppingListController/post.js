@@ -16,11 +16,12 @@ const postList = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('A Shopping List Name Must Be Provided')
     }
-    if (name && typeof name !== 'string') {
-        res.status(400);
-        throw new Error('A Shopping List Name Must Be A String Variable')
+    if (name.length > 15 || name.length < 8 || typeof name !== 'string') {
+            res.status(400);
+            throw new Error('List Name Cannot Have Spaces Or Be Less Than 8 Or Greater Than 15 Characters')
     }
     const shoppingList = await ShoppingList.find({ user: req.user.id });
+    
     if (shoppingList.some(list => list.name === name)) {
         res.status(400);
         throw new Error('A Shopping List With The Same Name Already Exists')
