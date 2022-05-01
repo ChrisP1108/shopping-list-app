@@ -4,20 +4,32 @@ import { useInterval } from 'react-interval-hook';
 import Svg, { G, Path } from 'react-native-svg';
 import { defaultColor } from '../observables/themeColor.js';
 
-function Loading() {
+function Startup() {
     const spinnerHighlight = defaultColor();
-    const spinnerColors = [spinnerHighlight, "#fff", "#fff", "#fff", "#fff","#fff","#fff", "#fff"]
+    const spinnerColors = [spinnerHighlight, "#fff", "#fff", "#fff", spinnerHighlight, "#fff", "#fff", "#fff"]
     
     const [spinner, setSpinner] = useState(spinnerColors);
-    const [counter, setCounter] = useState(0);
+    const [counter, setCounter] = useState([0, 4]);
 
     useInterval(() => {
         setSpinner(spinner.map((color, index) => 
-            index === counter ? spinnerHighlight : '#fff'));
-        if (counter >= 7) {
-            setCounter(0)
-        } else setCounter(counter + 1)
-    }, 150);
+            counter.includes(index) ? spinnerHighlight : '#fff'));
+        if (counter[0] === 0) {
+            setCounter([1, 5]);
+        }
+        if (counter[0] === 1) {
+            setCounter([2, 6]);
+        }
+        if (counter[0] === 2) {
+            setCounter([3, 7]);
+        }
+        if(counter[0] === 3) {
+            setCounter([4, 0]);
+        }
+        if(counter[0] === 4) {
+            setCounter([1, 5]);
+        }
+    }, 200);
     
     return (
         <>
@@ -52,4 +64,4 @@ function Loading() {
     )
 }
 
-export default Loading;
+export default Startup;

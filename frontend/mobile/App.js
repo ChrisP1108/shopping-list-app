@@ -1,19 +1,23 @@
 import React, { useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { defaultColor, getThemeColor, setThemeColor } from './observables/themeColor.js';
+import { defaultColor, getThemeColor } from './observables/themeColor.js';
 
-import Loading from './pages/Loading'
+import Header from './components/Header';
+import Startup from './pages/Startup';
 
 function App() {
   const [theme, setTheme] = useState(defaultColor());
-
+  const [loading, setLoading] = useState(false);
   getThemeColor().subscribe(value => setTheme(value));
 
   return (
-    <LinearGradient colors={['#fff', theme]} style={globalStyles.bodyContainer}>
-        <Loading />
-    </LinearGradient>
+    <>
+      {!loading && <Header headline='Login' />}
+      <LinearGradient colors={['#fff', theme]} style={globalStyles.bodyContainer}>
+          { loading && <Startup /> }
+      </LinearGradient>
+    </>
   )
 }
 
