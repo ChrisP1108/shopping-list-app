@@ -8,14 +8,16 @@ import Startup from './pages/Startup';
 
 function App() {
   const [theme, setTheme] = useState(defaultColor());
-  const [loading, setLoading] = useState(false);
+  const [startingUp, setStartingUp] = useState(false);
+  const [route, setRoute] = useState('');
+  
   getThemeColor().subscribe(value => setTheme(value));
 
   return (
     <>
-      {!loading && <Header headline='Login' />}
+      {!startingUp && <Header headline='Login' />}
       <LinearGradient colors={['#fff', theme]} style={globalStyles.bodyContainer}>
-          { loading && <Startup /> }
+          { startingUp && <Startup /> }
       </LinearGradient>
     </>
   )

@@ -1,24 +1,11 @@
 import { Subject } from 'rxjs';
 
-let subjectHttp = new Subject();
+let subjectData = new Subject();
 
-let token;
+export function getData() {
+    return subjectData;
+}
 
-async function httpReq(url, method, data) {
-    if (!method) {
-        method = 'GET'
-    }
-    try {
-        const res = await fetch(url, {
-            method,
-            headers: {
-                'content-type': 'application/json',
-                'authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(data)
-        });
-        return { status: res.status, ok: res.ok, data: await res.json()}
-    } catch (err) {
-        return { status: null, ok: false, msg: err}
-    }
+export function setData(value) {
+    return subjectData.next(value)
 }
