@@ -5,7 +5,10 @@ import { getThemeColor } from '../observables/themeColor.js';
 function Header({ headline }) {
     const [theme, setTheme] = useState(getThemeColor()._value);
 
-    getThemeColor().subscribe(setTheme);
+    useEffect(() => {
+        getThemeColor().subscribe(setTheme);
+    }, [getThemeColor()])
+    
 
     return (
         <View style={{height: 60, backgroundColor: theme, alignItems: 'center'}}>
