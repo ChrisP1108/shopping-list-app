@@ -1,6 +1,6 @@
-import { Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
-let subjectRoute = new Subject();
+let subjectRoute = new BehaviorSubject(null);
 
 const routeHistory = [];
 
@@ -14,8 +14,8 @@ export function setRoute(route) {
 }
 
 export function goBackRoute() {
-    const back = routeHistory.pop()
+    const back = routeHistory.pop();
     if (back) {
-        subjectRoute.next(back)
+        subjectRoute.next(routeHistory[routeHistory.length - 1])
     }
 }

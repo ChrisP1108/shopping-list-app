@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, Image, Animated, StyleSheet } from 'react-native';
 import { useInterval } from 'react-interval-hook';
 import Svg, { G, Path } from 'react-native-svg';
-import { defaultColor } from '../observables/themeColor.js';
+import { getThemeColor } from '../observables/themeColor.js';
 
 function Startup() {
-    const spinnerHighlight = defaultColor();
+    const spinnerHighlight = getThemeColor()._value;
     const spinnerColors = [spinnerHighlight, "#fff", "#fff", "#fff", spinnerHighlight, "#fff", "#fff", "#fff"]
     
     const [spinner, setSpinner] = useState(spinnerColors);

@@ -1,6 +1,6 @@
-import { Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
-let subjectData = new Subject();
+let subjectData = new BehaviorSubject(null);
 
 export function getData() {
     return subjectData;
