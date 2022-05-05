@@ -4,9 +4,10 @@ import LinearGradient from 'react-native-linear-gradient';
 
 import { getThemeColor, setThemeColor } from './observables/themeColor';
 import { getRoute, setRoute } from './observables/router';
-import { getData, setData } from './observables/data.js';
+import { getData, setData } from './observables/data';
 
-import { httpReq } from './httpReq';
+import { getToken, storeToken } from './middleware/storage';
+import { httpReq } from './middleware/httpReq';
 
 import Header from './components/Header';
 
@@ -40,12 +41,17 @@ function App() {
         setLoading(false);
       }
     });
-    setTimeout(() => {
-      if (!token) {
-        setRoute('Login')
+    httpReq('/users/user').then(res => {
+      if (res.ok) {
+        setData(res.data);
       }
-      setLoading(false);
-    }, 3000)
+      setTimeout(() => {
+        if (res.ok) {
+          setRoute('User')
+        } else setRoute('Login')
+        setLoading(false);
+      }, 3000)
+    });
   }, [getThemeColor(), getRoute(), getData()]);
 
   function router() {
