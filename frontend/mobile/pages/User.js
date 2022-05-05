@@ -3,7 +3,7 @@ import { Text, View, StyleSheet } from 'react-native';
 
 import { getThemeColor} from '../observables/themeColor';
 import { getRoute, setRoute } from '../observables/router';
-import { getData, setData } from './observables/data.js';
+import { getData, setData } from '../observables/data';
 
 import { httpReq } from '../middleware/httpReq';
 

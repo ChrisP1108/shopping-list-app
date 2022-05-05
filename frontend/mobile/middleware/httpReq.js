@@ -11,8 +11,11 @@ export async function httpReq(url, method, data) {
         const res = await fetch(path + url, {
             method,
             headers: {
-                'content-type': 'application/json',
-                'authorization': `Bearer ${token}`
+                'Access-Control-Allow-Origin': '*',
+                'Cache-Control': 'no-cache',
+                'Content-Type': 'application/json',
+                'Accept': '/',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(data)
         });

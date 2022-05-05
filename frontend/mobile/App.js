@@ -45,6 +45,7 @@ function App() {
       if (res.ok) {
         setData(res.data);
       }
+      console.log(res);
       setTimeout(() => {
         if (res.ok) {
           setRoute('User')
