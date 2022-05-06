@@ -1,21 +1,28 @@
 import { BehaviorSubject } from 'rxjs';
 
-let subjectRoute = new BehaviorSubject(null);
+let routeData = {
+    current: null,
+    history: []
+}
 
-const routeHistory = [];
+const subjectRoute = new BehaviorSubject(routeData);
 
 export function getRoute() {
     return subjectRoute;
 }
 
 export function setRoute(route) {
-    routeHistory.push(route);
-    subjectRoute.next(route);
+    if (routeData.current) {
+        routeData.history.push(routeData.current)
+    }
+    routeData.current = route;
+    subjectRoute.next(routeData);
 }
 
 export function goBackRoute() {
-    const back = routeHistory.pop();
-    if (back) {
-        subjectRoute.next(routeHistory[routeHistory.length - 1])
+    const back = routeData.history.pop();
+    if (routeData.history.length) {
+        routeData.current = back;
+        subjectRoute.next(routeData);
     }
 }

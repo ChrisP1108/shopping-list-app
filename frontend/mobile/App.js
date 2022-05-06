@@ -28,19 +28,11 @@ import AddOrEditItem from './pages/AddOrEditItem';
 function App() {
 
   const [theme, setTheme] = useState(getThemeColor()._value);
-  const [loading, setLoading] = useState(true);
-  const [route, setAppRoute] = useState(getRoute()._value);
-
-  const token = null;
+  const [route, setAppRoute] = useState(getRoute()._value.current);
   
   useEffect(() => {
     getThemeColor().subscribe(setTheme);
-    getRoute().subscribe(setAppRoute);
-    getData().subscribe(data => {
-      if (data) {
-        setLoading(false);
-      }
-    });
+    getRoute().subscribe(value => setAppRoute(value.current));
     httpGet('/users/user').then(res => {
       if (res.ok) {
         setData(res.data);
@@ -50,7 +42,6 @@ function App() {
         if (res.ok) {
           setRoute('User')
         } else setRoute('Login')
-        setLoading(false);
       }, 3000)
     });
   }, [getThemeColor(), getRoute(), getData()]);
@@ -92,10 +83,10 @@ function App() {
 
   return (
     <>
-      {!loading && <Header headline={route} />}
+      {route && <Header headline={route} />}
       <LinearGradient colors={['#fff', theme]} style={globalStyles.bodyContainer}>
-          { loading && <Startup /> }
-          { !loading && router() }
+          { !route && <Startup /> }
+          { route && router() }
       </LinearGradient>
     </>
   )

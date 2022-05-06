@@ -1,6 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 
-let subjectThemeColor = new BehaviorSubject('#67B6FF');
+const subjectThemeColor = new BehaviorSubject('#67B6FF');
 
 export function getThemeColor() {
     return subjectThemeColor;
