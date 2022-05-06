@@ -5,7 +5,7 @@ import { getThemeColor} from '../observables/themeColor';
 import { getRoute, setRoute } from '../observables/router';
 import { getData, setData } from '../observables/data';
 
-import { httpReq } from '../middleware/httpReq';
+import { httpGet } from '../middleware/httpReq';
 
 import { globalStyles } from '../App';
 

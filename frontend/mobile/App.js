@@ -7,7 +7,7 @@ import { getRoute, setRoute } from './observables/router';
 import { getData, setData } from './observables/data';
 
 import { getToken, storeToken } from './middleware/storage';
-import { httpReq } from './middleware/httpReq';
+import { httpGet } from './middleware/httpReq';
 
 import Header from './components/Header';
 
@@ -41,7 +41,7 @@ function App() {
         setLoading(false);
       }
     });
-    httpReq('/users/user').then(res => {
+    httpGet('/users/user').then(res => {
       if (res.ok) {
         setData(res.data);
       }
