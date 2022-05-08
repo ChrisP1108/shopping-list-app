@@ -2,6 +2,8 @@ import { getToken } from './storage';
 
 const path = 'http://192.168.0.102:5000/api'
 
+export const timeoutRes = { status: 408, ok: false, msg: 'Server Connection Timed Out' };
+
 function header(token) {
     return { 
         'Access-Control-Allow-Origin': '*',

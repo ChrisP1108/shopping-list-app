@@ -1,19 +1,17 @@
-import React, { useState } from 'react';
-import { View, TouchableOpacity } from 'react-native';
-import { useInterval } from 'react-interval-hook';
+import React from 'react';
+import { TouchableOpacity } from 'react-native';
 import Svg, { G, Path } from 'react-native-svg';
-import { getThemeColor } from '../observables/themeColor.js';
 
-function ButtonRefresh({ pressed }) {
+function ButtonRefresh({ pressed, size, color }) {
 
     return (
         <TouchableOpacity onPress={() => pressed()}>
             <Svg 
-                width={64} height={64} viewBox="0 0 56.000000 56.000000"
+                width={size} height={size} viewBox="0 0 56.000000 56.000000"
                 preserveAspectRatio="xMidYMid meet">
 
                 <G transform="translate(0.000000,56.000000) scale(0.100000,-0.100000)"
-                fill="#000000" stroke="none">
+                fill={color} stroke="none">
                     <Path d="M183 469 c-45 -22 -103 -90 -103 -121 0 -10 3 -18 8 -18 4 0 16 -3
                     28 -6 16 -4 26 2 42 30 36 61 112 85 182 56 31 -13 32 -14 11 -22 -14 -5 -21
                     -15 -19 -25 2 -13 18 -20 62 -26 83 -12 89 -8 81 56 -10 69 -21 97 -40 97 -13

@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useObservableState } from 'observable-hooks';
 
-import { Text, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
 import { getThemeColor, setThemeColor } from './observables/themeColor';
 import { getRoute, setRoute } from './observables/router';
-import { getData, setData } from './observables/data';
+import { setData } from './observables/data';
 
-import { getToken, storeToken } from './middleware/storage';
-import { httpGet } from './middleware/httpReq';
+import { httpGet, timeoutRes } from './middleware/httpReq';
 
 import Header from './components/Header';
 
@@ -43,24 +40,27 @@ function App() {
       loaded = true;
       if (res.ok) {
         setData(res.data);
-      }
-      console.log(res);
+      } 
       setTimeout(() => {
         if (res.ok) {
           setRoute('User')
-        } else if (!res.ok && res.status){
+          if (res.data.user.settings.themeColor !== 'default') {
+            setThemeColor(color)
+          }
+        } else if (!res.ok && res.status !== 408){
           setRoute('Login')
         } else {
-          setError({ isErr: true, msg: 'Error Connecting To Server'});
+          console.error(res.msg)
+          setError({ isErr: true, msg: res.msg});
         }
       }, 3000)
     });
     setTimeout(() => {
       if (!loaded) {
-        setError({ isErr: true, msg: 'Server Connection Timed Out'});
+        setError({ isErr: true, msg: timeoutRes.msg})
       }
     }, 12000)
-  }, [getThemeColor(), getRoute(), setData()]);
+  }, [getThemeColor(), getRoute()]);
 
   function router() {
     switch(route) {

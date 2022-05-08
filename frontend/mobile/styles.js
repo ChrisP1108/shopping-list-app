@@ -1,5 +1,7 @@
 import { StyleSheet } from 'react-native';
 
+const errColor = '#b71c1c';
+
 export const globalStyles = StyleSheet.create({
     bodyContainer: {
         flex: 1,
@@ -24,6 +26,25 @@ export const globalStyles = StyleSheet.create({
         marginBottom: 16,
         marginTop: 16
     },
+    fieldErrorText: {
+        fontSize: 12,
+        fontFamily: 'roboto',
+        fontWeight: 'bold',
+        color: errColor,
+        textAlign: 'center',
+        marginTop: 4
+    },
+    fieldErrorBorderColor: {
+        color: errColor
+    },
+    serverErrorText: {
+        fontSize: 18,
+        fontFamily: 'roboto',
+        fontWeight: 'bold',
+        color: errColor,
+        textAlign: 'center',
+        marginTop: 16
+    },
     textInput: {
         height: 40,
         fontFamily: 'roboto',
@@ -32,12 +53,5 @@ export const globalStyles = StyleSheet.create({
         borderWidth: 1,
         fontSize: 16,
         textAlign: 'center'
-    },
-    buttonText: {
-        fontFamily: 'roboto',
-        fontSize: 16,
-        color: '#000',
-        textAlign: 'center',
-        marginTop: 8
     }
 });

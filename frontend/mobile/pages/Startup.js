@@ -7,7 +7,7 @@ import Svg, { G, Path } from 'react-native-svg';
 import { getThemeColor } from '../observables/themeColor.js';
 
 import LoadingSpinner from '../components/LoadingSpinner';
-import ButtonRefresh from '../components/ButtonRefresh';
+import Button from '../components/Button';
 import { globalStyles } from '../styles.js';
 
 function Startup({ error }) {
@@ -43,8 +43,7 @@ function Startup({ error }) {
                 }
                 { error.isErr && 
                     <View style={{marginTop: 40, marginBottom: 'auto'}}>
-                        <ButtonRefresh pressed={reload}/> 
-                        <Text style={globalStyles.buttonText}>Reload</Text>
+                        <Button pressed={reload} type='refresh' name='Reload'/> 
                     </View>
                 }
             </View>
