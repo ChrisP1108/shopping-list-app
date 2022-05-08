@@ -7,7 +7,7 @@ import { getData, setData } from '../observables/data';
 
 import { httpGet } from '../middleware/httpReq';
 
-import { globalStyles } from '../App';
+import { globalStyles } from '../styles';
 
 
 function Delete1() {

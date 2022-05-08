@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { useObservableState } from 'observable-hooks';
+
+import { Text, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
 import { getThemeColor, setThemeColor } from './observables/themeColor';
@@ -25,15 +27,20 @@ import ShoppingLists from './pages/ShoppingLists';
 import Checklist from './pages/Checklist';
 import AddOrEditItem from './pages/AddOrEditItem';
 
+import { globalStyles } from './styles';
+
 function App() {
 
   const [theme, setTheme] = useState(getThemeColor()._value);
   const [route, setAppRoute] = useState(getRoute()._value.current);
+  const [error, setError] = useState({ isErr: false, msg: null });
   
   useEffect(() => {
+    let loaded = false;
     getThemeColor().subscribe(setTheme);
     getRoute().subscribe(value => setAppRoute(value.current));
     httpGet('/users/user').then(res => {
+      loaded = true;
       if (res.ok) {
         setData(res.data);
       }
@@ -41,10 +48,19 @@ function App() {
       setTimeout(() => {
         if (res.ok) {
           setRoute('User')
-        } else setRoute('Login')
+        } else if (!res.ok && res.status){
+          setRoute('Login')
+        } else {
+          setError({ isErr: true, msg: 'Error Connecting To Server'});
+        }
       }, 3000)
     });
-  }, [getThemeColor(), getRoute(), getData()]);
+    setTimeout(() => {
+      if (!loaded) {
+        setError({ isErr: true, msg: 'Server Connection Timed Out'});
+      }
+    }, 12000)
+  }, [getThemeColor(), getRoute(), setData()]);
 
   function router() {
     switch(route) {
@@ -85,7 +101,7 @@ function App() {
     <>
       {route && <Header headline={route} />}
       <LinearGradient colors={['#fff', theme]} style={globalStyles.bodyContainer}>
-          { !route && <Startup /> }
+          { !route && <Startup error={error} /> }
           { route && router() }
       </LinearGradient>
     </>
@@ -93,27 +109,3 @@ function App() {
 }
 
 export default App;
-
-export const globalStyles = StyleSheet.create({
-  bodyContainer: {
-    flex: 1,
-    alignItems: 'center'
-  },
-  sectionContainer: {
-    backgroundColor: 'white',
-    borderRadius: 6,
-    borderWidth: 3,
-    width: '85%',
-    alignItems: 'center',
-    marginTop: 24,
-    paddingTop: 16,
-    paddingLeft: 24,
-    paddingRight: 24,
-    paddingBottom: 16
-  },
-  fieldHeadingText: {
-    fontSize: 16,
-    fontFamily: 'Roboto',
-    fontWeight: 'bold'
-  }
-});
