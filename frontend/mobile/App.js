@@ -43,8 +43,9 @@ function App() {
       } 
       setTimeout(() => {
         if (res.ok) {
-          setRoute('User')
-          if (res.data.user.settings.themeColor !== 'default') {
+          setRoute('User');
+          const color = res.data.user.settings.themeColor
+          if (color !== 'default') {
             setThemeColor(color)
           }
         } else if (!res.ok && res.status !== 408){

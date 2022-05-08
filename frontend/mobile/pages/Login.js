@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 
-import { getThemeColor} from '../observables/themeColor';
+import { getThemeColor, setThemeColor } from '../observables/themeColor';
 import { getRoute, setRoute } from '../observables/router';
 import { getData, setData } from '../observables/data';
 
@@ -30,9 +30,12 @@ function Login() {
             loaded = true;
             if (res.ok) {
                 setData(res.data);
-                console.log(res.data);
                 storeToken(res.data.token);
                 clearCredentials();
+                const color = res.data.settings.themeColor
+                if(color !== 'default') {
+                    setThemeColor(color)
+                }
                 setRoute('User');
             } else if (!res.ok && res.status) {
                 setResError({ isErr: true, msg: res.data.msg });
