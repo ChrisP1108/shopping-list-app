@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, Image, Animated, StyleSheet } from 'react-native';
-import { getThemeColor } from '../observables/themeColor.js';
+import { getThemeColor } from '../observables/themeColor';
 
 function Header({ headline }) {
     const [theme, setTheme] = useState(getThemeColor()._value);

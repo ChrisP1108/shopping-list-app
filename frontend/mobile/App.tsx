@@ -33,7 +33,7 @@ function App() {
   const [error, setError] = useState({ isErr: false, msg: null });
   
   useEffect(() => {
-    let loaded = false;
+    let loaded: boolean = false;
     getThemeColor().subscribe(setTheme);
     getRoute().subscribe(value => setAppRoute(value.current));
     httpGet('/users/user').then(res => {

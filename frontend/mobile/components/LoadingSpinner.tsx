@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import { useInterval } from 'react-interval-hook';
 import Svg, { G, Path } from 'react-native-svg';
-import { getThemeColor } from '../observables/themeColor.js';
+import { getThemeColor } from '../observables/themeColor';
 
 function LoadingSpinner() {
     const spinnerHighlight = getThemeColor()._value;
