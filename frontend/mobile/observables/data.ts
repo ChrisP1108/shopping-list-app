@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 interface dataInterface {
     user: { 
@@ -11,16 +11,17 @@ interface dataInterface {
             sortBy: string,
             showChecked: boolean
         }
-        savedShoppingLists: Array,
-        
+        savedShoppingLists: Array<any>,
+        activeShoppingLists: Array<any>
+    }
 }
 
-const subjectData: Observable<dataInterface> = new BehaviorSubject(null);
+const subjectData: BehaviorSubject<any> = new BehaviorSubject(null);
 
 export function getData() {
     return subjectData;
 }
 
-export function setData(value: any) {
-    return subjectData.next(value)
+export function setData(value: dataInterface) {
+    subjectData.next(value)
 }

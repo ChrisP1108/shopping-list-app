@@ -9,11 +9,11 @@ getColor().then(color => {
 
 const subjectThemeColor = new BehaviorSubject('#67B6FF');
 
-export function getThemeColor() {
+export function getThemeColor(): any {
     return subjectThemeColor;
 }
 
-export function setThemeColor(value) {
+export function setThemeColor(value: string): void {
     storeColor(value);
     subjectThemeColor.next(value);
 }
