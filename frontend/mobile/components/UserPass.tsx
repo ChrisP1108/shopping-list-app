@@ -10,22 +10,22 @@ import { httpGet } from '../middleware/httpReq';
 import { globalStyles } from '../styles';
 
 
-function UserPass({ userPassData, inputError }) {
+function UserPass({ userPassData, inputError }: any) {
 
-    const [credentials, setCredentials] = useState({
+    const [credentials, setCredentials]: any = useState({
         username: '',
         password: ''
     });
 
     const errMsg = 'Must Be Between 8 And 15 Characters In Length';
 
-    function inputValues(input) {
+    function inputValues(input: { name: string, value: string}) {
         const output = { ...credentials, [input.name]: input.value };
         setCredentials(output);
         userPassData(output);
     }
 
-    function hasErr(type) {
+    function hasErr(type: string) {
         if (inputError) {
             if (credentials[type].length < 8 || credentials[type].length > 15) {
                 return true

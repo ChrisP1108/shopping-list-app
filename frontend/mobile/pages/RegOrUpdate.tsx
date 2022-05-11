@@ -10,7 +10,7 @@ import { httpGet } from '../middleware/httpReq';
 import { globalStyles } from '../styles';
 
 
-function RegOrUpdate() {
+function RegOrUpdate({ update }) {
     return (
         <>
             <View style={[globalStyles.sectionContainer, {borderColor: getThemeColor()._value}]}>

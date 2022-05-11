@@ -2,7 +2,7 @@ import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import Svg, { G, Path } from 'react-native-svg';
 
-function ButtonRefresh({ pressed, size, color }) {
+function ButtonRefresh({ pressed, size, color }: any) {
 
     return (
         <TouchableOpacity onPress={() => pressed()}>

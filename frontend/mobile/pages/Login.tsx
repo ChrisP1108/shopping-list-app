@@ -13,12 +13,11 @@ import Button from '../components/Button';
 
 import { globalStyles } from '../styles';
 
-
 function Login() {
 
-    const [credentials, setCredentials] = useState(clearCredentials());
-    const [resError, setResError] = useState({ isErr: false, msg: null});
-    const [inputError, setInputError] = useState(false);
+    const [credentials, setCredentials]: any = useState(clearCredentials());
+    const [resError, setResError]: any = useState({ isErr: false, msg: null});
+    const [inputError, setInputError]: any = useState(false);
 
     function clearCredentials() {
         return { username: '', password: '' }
@@ -26,7 +25,7 @@ function Login() {
 
     function login() {
         let loaded = false;
-        httpPost('/users/login', credentials).then(res => {
+        httpPost('/users/login', credentials).then((res: any) => {
             loaded = true;
             if (res.ok) {
                 setData(res.data);
@@ -68,8 +67,12 @@ function Login() {
             <View style={[globalStyles.sectionContainer, { borderColor: getThemeColor()._value }]}>
                 <UserPass inputError={inputError} userPassData={setCredentials} />
                 { resError.isErr && <Text style={globalStyles.serverErrorText}>{resError.msg}</Text> }
-                <View style={{marginTop: 16}}>
-                    <Button pressed={inputChecker} type='login' name='Login'/> 
+                <View style={{marginTop: 16, height: 320, justifyContent: 'space-between'}}>
+                    <Button pressed={() => inputChecker()} type='login' name='Login'/> 
+                    <Button pressed={() => setRoute('Recover Credentials')} 
+                        type='forgot' name='Forgot Login Credentials?'/>
+                    <Button pressed={() => setRoute('Register New User')} 
+                        type='addUser' name='Not Yet Registered?'/> 
                 </View>
             </View>
         </>

@@ -5,14 +5,14 @@ import Svg, { G, Path } from 'react-native-svg';
 import { getThemeColor } from '../observables/themeColor';
 
 function LoadingSpinner() {
-    const spinnerHighlight = getThemeColor()._value;
-    const spinnerColors = [spinnerHighlight, "#fff", "#fff", "#fff", spinnerHighlight, "#fff", "#fff", "#fff"]
+    const spinnerHighlight: string = getThemeColor()._value;
+    const spinnerColors: Array<string> = [spinnerHighlight, "#fff", "#fff", "#fff", spinnerHighlight, "#fff", "#fff", "#fff"]
     
-    const [spinner, setSpinner] = useState(spinnerColors);
-    const [counter, setCounter] = useState([0, 4]);
+    const [spinner, setSpinner]: Array<any> = useState(spinnerColors);
+    const [counter, setCounter]: Array<any> = useState([0, 4]);
 
     useInterval(() => {
-        setSpinner(spinner.map((color, index) => 
+        setSpinner(spinner.map((color: string, index: number) => 
             counter.includes(index) ? spinnerHighlight : '#fff'));
         if (counter[0] === 0) {
             setCounter([1, 5]);

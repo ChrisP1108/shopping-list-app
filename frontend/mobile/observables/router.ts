@@ -1,17 +1,22 @@
 import { BehaviorSubject } from 'rxjs';
 
-let routeData = {
+interface routeData {
+    current: string | null,
+    history: string[]
+}
+
+const routeData: routeData = {
     current: null,
     history: []
 }
 
-const subjectRoute = new BehaviorSubject(routeData);
+const subjectRoute: BehaviorSubject<any>  = new BehaviorSubject(routeData);
 
-export function getRoute() {
+export function getRoute(): any {
     return subjectRoute;
 }
 
-export function setRoute(route) {
+export function setRoute(route: string): void {
     if (routeData.current) {
         routeData.history.push(routeData.current)
     }
@@ -19,8 +24,8 @@ export function setRoute(route) {
     subjectRoute.next(routeData);
 }
 
-export function goBackRoute() {
-    const back = routeData.history.pop();
+export function goBackRoute(): void {
+    const back: any = routeData.history.pop();
     if (routeData.history.length) {
         routeData.current = back;
         subjectRoute.next(routeData);

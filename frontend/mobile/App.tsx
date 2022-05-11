@@ -28,15 +28,15 @@ import { globalStyles } from './styles';
 
 function App() {
 
-  const [theme, setTheme] = useState(getThemeColor()._value);
-  const [route, setAppRoute] = useState(getRoute()._value.current);
-  const [error, setError] = useState({ isErr: false, msg: null });
+  const [theme, setTheme]: any = useState(getThemeColor()._value);
+  const [route, setAppRoute]: any = useState(getRoute()._value.current);
+  const [error, setError]: any = useState({ isErr: false, msg: null });
   
-  useEffect(() => {
+  useEffect((): void => {
     let loaded: boolean = false;
     getThemeColor().subscribe(setTheme);
-    getRoute().subscribe(value => setAppRoute(value.current));
-    httpGet('/users/user').then(res => {
+    getRoute().subscribe((value: any) => setAppRoute(value.current));
+    httpGet('/users/user').then((res: any) => {
       loaded = true;
       if (res.ok) {
         setData(res.data);
@@ -63,7 +63,7 @@ function App() {
     }, 12000)
   }, [getThemeColor(), getRoute()]);
 
-  function router() {
+  function router(): any {
     switch(route) {
       case 'Login': 
         return <Login />;

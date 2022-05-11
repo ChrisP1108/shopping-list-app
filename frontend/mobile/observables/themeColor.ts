@@ -7,7 +7,7 @@ getColor().then(color => {
     }
 }) 
 
-const subjectThemeColor = new BehaviorSubject('#67B6FF');
+const subjectThemeColor: BehaviorSubject<string> = new BehaviorSubject('#67B6FF');
 
 export function getThemeColor(): any {
     return subjectThemeColor;

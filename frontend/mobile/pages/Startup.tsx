@@ -10,7 +10,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import Button from '../components/Button';
 import { globalStyles } from '../styles.js';
 
-function Startup({ error }) {
+function Startup({ error }: any) {
 
     function reload() {
         RNRestart.Restart();

@@ -10,7 +10,7 @@ import { httpGet } from '../middleware/httpReq';
 import { globalStyles } from '../styles';
 
 
-function CreateOrEditList() {
+function CreateOrEditList({ edit }: boolean) {
     return (
         <>
             <View style={[globalStyles.sectionContainer, {borderColor: getThemeColor()._value}]}>

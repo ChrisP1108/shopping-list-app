@@ -2,10 +2,10 @@ import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import Svg, { G, Path } from 'react-native-svg';
 
-function ButtonLogin({ pressed, size, color }) {
+function ButtonLogin({ pressed, size, color }: any) {
 
     return (
-        <TouchableOpacity onPress={() => pressed()}>
+        <TouchableOpacity onPress={() => pressed()} style={{marginRight: 16}}>
             <Svg 
                 width={size} height={size} viewBox="0 0 64.000000 43.000000"
                 preserveAspectRatio="xMidYMid meet">
